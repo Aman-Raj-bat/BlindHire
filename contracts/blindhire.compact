@@ -93,3 +93,38 @@ export circuit prove_qualification(): [] {
 }
 
 // Recruiter updates job screening requirements
+export circuit update_job_requirements(
+    new_min_gpa: Uint<32>,
+    new_min_experience_months: Uint<32>,
+    new_degree_code: Uint<32>,
+    new_cert_code: Uint<32>,
+    new_deadline: Uint<64>,
+    new_max_applicants: Uint<32>,
+    new_active_status: Boolean
+): [] {
+    const sk = recruiter_secret_key();
+    assert(recruiter == recruiterPublicKey(sk), "BlindHire: Unauthorized recruiter key");
+
+    min_gpa = disclose(new_min_gpa);
+    min_experience_months = disclose(new_min_experience_months);
+    required_degree_code = disclose(new_degree_code);
+    required_certification_code = disclose(new_cert_code);
+    application_deadline = disclose(new_deadline);
+    max_applicants = disclose(new_max_applicants);
+    is_active = disclose(new_active_status);
+}
+
+// =============================================================================
+// Pure Circuits (Deterministic ZK helper functions)
+// =============================================================================
+export pure circuit recruiterPublicKey(sk: Bytes<32>): Bytes<32> {
+    return persistentHash<Vector<2, Bytes<32>>>([pad(32, "blindhire:recruiter:v1"), sk]);
+}
+
+export pure circuit makeNullifier(candidate_id: Bytes<32>): Bytes<32> {
+    return persistentHash<Vector<2, Bytes<32>>>([pad(32, "blindhire:nullifier:v1"), candidate_id]);
+}
+
+export pure circuit makeQualificationReceipt(nullifier: Bytes<32>): Bytes<32> {
+    return persistentHash<Vector<2, Bytes<32>>>([pad(32, "blindhire:receipt:v1"), nullifier]);
+}
