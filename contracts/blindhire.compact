@@ -68,3 +68,28 @@ export circuit prove_qualification(): [] {
     // 1. Verify job is currently accepting applications
     assert(disclose(is_active), "BlindHire: Job screening is paused");
     assert(blockTimeLt(disclose(application_deadline)), "BlindHire: Application deadline has passed");
+    assert(disclose(qualified_count) < disclose(max_applicants), "BlindHire: Qualification limit reached");
+
+    // 2. Fetch private candidate credentials into ZK circuit
+    const creds = candidate_credentials();
+
+    // 3. Verify qualification thresholds in zero-knowledge
+    assert(creds.gpa_scaled >= min_gpa, "BlindHire: GPA below required threshold");
+    assert(creds.experience_months >= min_experience_months, "BlindHire: Experience below required threshold");
+    assert(creds.degree_code == required_degree_code, "BlindHire: Degree field does not match requirement");
+    assert(creds.certification_code == required_certification_code, "BlindHire: Missing required certification");
+
+    // 4. Derive anonymous nullifier to prevent double-qualification without revealing identity
+    const nul = makeNullifier(creds.candidate_id);
+    assert(!nullifiers.member(disclose(nul)), "BlindHire: Candidate already proved qualification for this job");
+
+    // 5. Derive verifiable qualification receipt commitment
+    const receipt = makeQualificationReceipt(nul);
+
+    // 6. Record public ledger state update
+    nullifiers.insert(disclose(nul));
+    qualification_commitments.insert(disclose(receipt));
+    qualified_count = disclose((qualified_count + 1) as Uint<32>);
+}
+
+// Recruiter updates job screening requirements
