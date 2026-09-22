@@ -43,3 +43,28 @@ constructor(
     initial_degree_code: Uint<32>,
     initial_cert_code: Uint<32>,
     recruiter_admin_hash: Bytes<32>,
+    deadline: Uint<64>,
+    applicant_limit: Uint<32>
+) {
+    min_gpa = disclose(initial_min_gpa);
+    min_experience_months = disclose(initial_min_experience_months);
+    required_degree_code = disclose(initial_degree_code);
+    required_certification_code = disclose(initial_cert_code);
+    recruiter = disclose(recruiter_admin_hash);
+    application_deadline = disclose(deadline);
+    max_applicants = disclose(applicant_limit);
+    is_active = disclose(true);
+    qualified_count = disclose(0);
+}
+
+// =============================================================================
+// Core ZK Circuits
+// =============================================================================
+
+// Candidate submits a zero-knowledge proof that they satisfy all job requirements.
+// The recruiter learns ONLY that all 4 requirements are satisfied, without
+// learning exact GPA, exact experience, university, or private identity credentials.
+export circuit prove_qualification(): [] {
+    // 1. Verify job is currently accepting applications
+    assert(disclose(is_active), "BlindHire: Job screening is paused");
+    assert(blockTimeLt(disclose(application_deadline)), "BlindHire: Application deadline has passed");
