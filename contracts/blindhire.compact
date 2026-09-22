@@ -1,0 +1,45 @@
+pragma language_version >= 0.22;
+
+import CompactStandardLibrary;
+
+// =============================================================================
+// BlindHire - Privacy-Preserving Candidate Screening
+// "Qualified before identified."
+//
+// Ledger State (Public, on-chain)
+// =============================================================================
+export ledger min_gpa: Uint<32>;
+export ledger min_experience_months: Uint<32>;
+export ledger required_degree_code: Uint<32>;
+export ledger required_certification_code: Uint<32>;
+export ledger recruiter: Bytes<32>;
+export ledger application_deadline: Uint<64>;
+export ledger is_active: Boolean;
+export ledger max_applicants: Uint<32>;
+export ledger qualified_count: Uint<32>;
+export ledger nullifiers: Set<Bytes<32>>;
+export ledger qualification_commitments: Set<Bytes<32>>;
+
+// =============================================================================
+// Private Witnesses (NEVER revealed on-chain, evaluated inside ZK prover)
+// =============================================================================
+struct CandidateCredentials {
+    degree_code: Uint<32>,
+    gpa_scaled: Uint<32>,
+    experience_months: Uint<32>,
+    certification_code: Uint<32>,
+    candidate_id: Bytes<32>
+}
+
+witness candidate_credentials(): CandidateCredentials;
+witness recruiter_secret_key(): Bytes<32>;
+
+// =============================================================================
+// Constructor - Called once at deployment to initialize job requirements
+// =============================================================================
+constructor(
+    initial_min_gpa: Uint<32>,
+    initial_min_experience_months: Uint<32>,
+    initial_degree_code: Uint<32>,
+    initial_cert_code: Uint<32>,
+    recruiter_admin_hash: Bytes<32>,
