@@ -83,4 +83,80 @@ describe('BlindHire Zero-Knowledge Circuit Logic & Protocol Verification', () =>
       degreePassed,
       certPassed,
       isQualified: gpaPassed && expPassed && degreePassed && certPassed,
+    };
+  };
+
+  // Test 5: Valid qualification proof (Candidate Aman)
+  it('5. verifies complete qualification for a qualifying candidate (GPA 8.7, Exp 24mo, CS/IT, Node.js)', () => {
+    const valid = evaluateQualification({
+      gpa_scaled: 870n,
+      experience_months: 24n,
+      degree_code: 1n,
+      certification_code: 101n,
+    });
+    expect(valid.gpaPassed).toBe(true);
+    expect(valid.expPassed).toBe(true);
+    expect(valid.degreePassed).toBe(true);
+    expect(valid.certPassed).toBe(true);
+    expect(valid.isQualified).toBe(true);
+  });
+
+  // Test 6: Rejection on invalid GPA threshold (6.90 < 7.50)
+  it('6. rejects candidate whose GPA is below minimum threshold (GPA: 6.90 < 7.50)', () => {
+    const lowGpa = evaluateQualification({
+      gpa_scaled: 690n,
+      experience_months: 24n,
+      degree_code: 1n,
+      certification_code: 101n,
+    });
+    expect(lowGpa.gpaPassed).toBe(false);
+    expect(lowGpa.isQualified).toBe(false);
+  });
+
+  // Test 7: Rejection on insufficient experience (8 months < 12 months)
+  it('7. rejects candidate whose experience duration is below threshold (8mo < 12mo)', () => {
+    const lowExp = evaluateQualification({
+      gpa_scaled: 880n,
+      experience_months: 8n,
+      degree_code: 1n,
+      certification_code: 101n,
+    });
+    expect(lowExp.expPassed).toBe(false);
+    expect(lowExp.isQualified).toBe(false);
+  });
+
+  // Test 8: Rejection on mismatched degree field
+  it('8. rejects candidate whose degree does not match required field (Mechanical != CS)', () => {
+    const wrongDegree = evaluateQualification({
+      gpa_scaled: 920n,
+      experience_months: 36n,
+      degree_code: 4n,
+      certification_code: 101n,
+    });
+    expect(wrongDegree.degreePassed).toBe(false);
+    expect(wrongDegree.isQualified).toBe(false);
+  });
+
+  // Test 9: Rejection on missing certification
+  it('9. rejects candidate without required certification (cert 0 != 101)', () => {
+    const missingCert = evaluateQualification({
+      gpa_scaled: 850n,
+      experience_months: 18n,
+      degree_code: 1n,
+      certification_code: 0n,
+    });
+    expect(missingCert.certPassed).toBe(false);
+    expect(missingCert.isQualified).toBe(false);
+  });
+
+  // Test 10: Boundary verification at exact minimum thresholds
+  it('10. verifies qualification at exact threshold boundaries (GPA = 750n, Exp = 12n)', () => {
+    const boundary = evaluateQualification({
+      gpa_scaled: 750n,
+      experience_months: 12n,
+      degree_code: 1n,
+      certification_code: 101n,
+    });
+    expect(boundary.isQualified).toBe(true);
+  });
 });
