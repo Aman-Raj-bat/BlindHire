@@ -98,3 +98,82 @@ Candidate (Browser)                      Midnight Network (Preprod)             
 BlindHire enforces honest cryptographic standards:
 
 - **DEMO CREDENTIALS (Current Hackathon Scope):** Inputs entered into the Candidate Vault are clearly labeled as `[DEMO CREDENTIAL]` self-attestations. This allows reviewers to immediately test boundary conditions, qualifying profiles, and disqualifying profiles without third-party institutional dependencies.
+- **ISSUED / VERIFIED CREDENTIALS (Production Protocol):** In production deployment, credential witnesses are signed by verifiable institutional registries (universities, certification authorities). The Compact circuit validates the issuer's signature alongside the threshold constraints.
+
+---
+
+## 6. Compact Smart Contract Architecture
+
+The core contract is implemented in `contracts/blindhire.compact` using Compact language version $\ge 0.22$.
+
+### Key Technical Patterns:
+1. **Integer Type-Widening Protection:** Arithmetic operations in Compact widen `Uint<32>` types. All arithmetic casts back explicitly:
+   ```compact
+   qualified_count = disclose((qualified_count + 1) as Uint<32>);
+   ```
+2. **Exported Pure Circuits:** Deterministic cryptographic helpers are exported with the `export pure circuit` keyword so they are accessible from TypeScript:
+   ```compact
+   export pure circuit recruiterPublicKey(sk: Bytes<32>): Bytes<32> {
+       return persistentHash<Vector<2, Bytes<32>>>([pad(32, "blindhire:recruiter:v1"), sk]);
+   }
+
+   export pure circuit makeNullifier(candidate_id: Bytes<32>): Bytes<32> {
+       return persistentHash<Vector<2, Bytes<32>>>([pad(32, "blindhire:nullifier:v1"), candidate_id]);
+   }
+   ```
+3. **Disclose Boundary:** Only contract-wide public states and the derived anonymous nullifier pass through `disclose()`. Sensitive candidate credential attributes remain completely shielded in the witness.
+
+---
+
+## 7. Frontend & Midnight SDK Integration
+
+The frontend is built with **React 19**, **Vite 6**, **Three.js**, **Framer Motion**, and **TailwindCSS**.
+
+### Key Integration Highlights:
+- **Five Provider Pattern:** Full adherence to Midnight's 5-provider specification (`privateStateProvider`, `publicDataProvider`, `zkConfigProvider`, `proofProvider`, `walletProvider`, `midnightProvider`).
+- **Patched Indexer Public Data Provider:** Implements `createPatchedPublicDataProvider` to eliminate the known `offset: null` GraphQL crash on Midnight Preprod indexers.
+- **Browser Proving via WebAssembly:** `vite-plugin-wasm` and `vite-plugin-top-level-await` enable in-browser proof generation without backend bottlenecks.
+- **Lace & 1AM Wallet Connectors:** Seamless asynchronous polling for `window.midnight.mnLace` and `window.midnight['1am']`.
+
+---
+
+## 8. Interactive 3D Visual Experience
+
+BlindHire features interactive 3D components crafted with Three.js:
+
+1. **`ZKCredentialVault3D` (Landing Hero):** An interactive obsidian cryptographic core surrounded by 4 orbital requirement rings (Degree, GPA, Experience, Certification) and a vertical ZK aperture ring that responds dynamically to mouse movement and verification state.
+2. **`PrivacyFlow3D` (How It Works):** A 3D cryptographic pipeline illustrating private data packets flowing through a refractive ZK prism into verified on-chain claims.
+3. **Graceful Degradation:** Automatic detection of `prefers-reduced-motion` and WebGL capabilities, providing high-fidelity fallback elements for low-power mobile devices.
+
+---
+
+## 9. Quick Start & Local Setup
+
+### Prerequisites
+- **Node.js:** $\ge 22.0.0$
+- **Yarn:** $1.22.22$
+- **Compact Compiler:** $0.5.2$ or $0.31.0$ (installed via Midnight installer)
+- **Docker Desktop:** (for local Midnight network testing)
+
+### Installation
+```bash
+# Clone the repository
+git clone https://github.com/Aman-Raj-bat/BlindHire.git
+cd BlindHire
+
+# Install dependencies
+yarn install
+cd frontend && npm install && cd ..
+```
+
+### Compile Compact Smart Contract
+```bash
+yarn compile
+```
+*Compiles `contracts/blindhire.compact` and synchronizes TypeScript types and ZK proving keys to `frontend/src/managed/` and `frontend/public/managed/`.*
+
+### Run Automated Tests
+```bash
+yarn test
+```
+*Runs the 10-test suite verifying pure circuits, deterministic nullifiers, threshold boundaries, and constraint rejections.*
