@@ -338,4 +338,69 @@ describe(`BlindHire Screening Contract (${network})`, () => {
     await submitCallTx(providers as any, {
       compiledContract: compiledWithWitnesses({
         candidate_credentials: (ctx: any) => [
+          ctx.privateState,
+          {
+            degree_code: 1n,
+            gpa_scaled: 750n, // Exact boundary
+            experience_months: 12n, // Exact boundary
+            certification_code: 101n,
+            candidate_id: candidateId,
+          },
+        ],
+      }),
+      contractAddress,
+      circuitId: 'prove_qualification',
+      privateStateId: PRIVATE_STATE_ID,
+      args: [],
+    } as any);
+
+    const state = await queryLedger(providers);
+    expect(state.qualified_count).toBeGreaterThanOrEqual(3n);
+  });
+
+  // Test 9: Recruiter updates job requirements with valid admin key
+  it('Allows the recruiter to update job screening criteria', async () => {
+    const newDeadline = BigInt(Math.floor(Date.now() / 1000) + 60 * 24 * 60 * 60);
+
+    await submitCallTx(providers as any, {
+      compiledContract: compiledWithWitnesses({
+        recruiter_secret_key: (ctx: any) => [ctx.privateState, recruiterSk],
+      }),
+      contractAddress,
+      circuitId: 'update_job_requirements',
+      privateStateId: PRIVATE_STATE_ID,
+      args: [
+        800n, // New min GPA: 8.00
+        24n, // New min Exp: 24 months
+        1n, // CS/IT
+        101n, // Node.js
+        newDeadline,
+        100n,
+        true,
+      ],
+    } as any);
+
+    const state = await queryLedger(providers);
+    expect(state.min_gpa).toEqual(800n);
+    expect(state.min_experience_months).toEqual(24n);
+    logger.info('Recruiter update verified on-chain');
+  });
+
+  // Test 10: Rejects unauthorized recruiter update attempts
+  it('Rejects unauthorized attempts to modify job requirements', async () => {
+    const fakeRecruiterSk = new Uint8Array(crypto.randomBytes(32));
+    const newDeadline = BigInt(Math.floor(Date.now() / 1000) + 60 * 24 * 60 * 60);
+
+    await expect(
+      submitCallTx(providers as any, {
+        compiledContract: compiledWithWitnesses({
+          recruiter_secret_key: (ctx: any) => [ctx.privateState, fakeRecruiterSk],
+        }),
+        contractAddress,
+        circuitId: 'update_job_requirements',
+        privateStateId: PRIVATE_STATE_ID,
+        args: [900n, 36n, 1n, 101n, newDeadline, 50n, true],
+      } as any),
+    ).rejects.toThrow();
+  });
 });
