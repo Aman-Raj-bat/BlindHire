@@ -248,4 +248,94 @@ describe(`BlindHire Screening Contract (${network})`, () => {
               candidate_id: candidateId,
             },
           ],
+        }),
+        contractAddress,
+        circuitId: 'prove_qualification',
+        privateStateId: PRIVATE_STATE_ID,
+        args: [],
+      } as any),
+    ).rejects.toThrow();
+  });
+
+  // Test 5: Rejects candidate with insufficient experience (e.g. 8 months < 12 months)
+  it('Rejects candidate whose experience is below minimum duration', async () => {
+    const candidateId = new Uint8Array(crypto.randomBytes(32));
+    await expect(
+      submitCallTx(providers as any, {
+        compiledContract: compiledWithWitnesses({
+          candidate_credentials: (ctx: any) => [
+            ctx.privateState,
+            {
+              degree_code: 1n,
+              gpa_scaled: 900n,
+              experience_months: 8n, // Below 12n
+              certification_code: 101n,
+              candidate_id: candidateId,
+            },
+          ],
+        }),
+        contractAddress,
+        circuitId: 'prove_qualification',
+        privateStateId: PRIVATE_STATE_ID,
+        args: [],
+      } as any),
+    ).rejects.toThrow();
+  });
+
+  // Test 6: Rejects candidate with mismatched degree (e.g. Mechanical Engineering = 4 != 1)
+  it('Rejects candidate whose degree field does not match requirement', async () => {
+    const candidateId = new Uint8Array(crypto.randomBytes(32));
+    await expect(
+      submitCallTx(providers as any, {
+        compiledContract: compiledWithWitnesses({
+          candidate_credentials: (ctx: any) => [
+            ctx.privateState,
+            {
+              degree_code: 4n, // Wrong field
+              gpa_scaled: 850n,
+              experience_months: 36n,
+              certification_code: 101n,
+              candidate_id: candidateId,
+            },
+          ],
+        }),
+        contractAddress,
+        circuitId: 'prove_qualification',
+        privateStateId: PRIVATE_STATE_ID,
+        args: [],
+      } as any),
+    ).rejects.toThrow();
+  });
+
+  // Test 7: Rejects candidate missing required certification (e.g. code 99 != 101)
+  it('Rejects candidate without required certification', async () => {
+    const candidateId = new Uint8Array(crypto.randomBytes(32));
+    await expect(
+      submitCallTx(providers as any, {
+        compiledContract: compiledWithWitnesses({
+          candidate_credentials: (ctx: any) => [
+            ctx.privateState,
+            {
+              degree_code: 1n,
+              gpa_scaled: 850n,
+              experience_months: 24n,
+              certification_code: 99n, // Wrong cert
+              candidate_id: candidateId,
+            },
+          ],
+        }),
+        contractAddress,
+        circuitId: 'prove_qualification',
+        privateStateId: PRIVATE_STATE_ID,
+        args: [],
+      } as any),
+    ).rejects.toThrow();
+  });
+
+  // Test 8: Exact threshold boundary values pass (GPA: 750n, Exp: 12n)
+  it('Passes verification at exact threshold boundaries (GPA = 750, Exp = 12)', async () => {
+    const candidateId = new Uint8Array(crypto.randomBytes(32));
+    await submitCallTx(providers as any, {
+      compiledContract: compiledWithWitnesses({
+        candidate_credentials: (ctx: any) => [
 });
