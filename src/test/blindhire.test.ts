@@ -138,4 +138,114 @@ describe(`BlindHire Screening Contract (${network})`, () => {
     const deadline = BigInt(Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60);
     const deployed: DeployedContract<Contract> = await deployContract<Contract>(providers, {
       compiledContract: CompiledBlindHire,
+      privateStateId: PRIVATE_STATE_ID,
+      initialPrivateState: {},
+      args: [MIN_GPA, MIN_EXP_MONTHS, REQ_DEGREE_CODE, REQ_CERT_CODE, recruiterHash, deadline, APPLICANT_LIMIT],
+    });
+
+    contractAddress = deployed.deployTxData.public.contractAddress;
+    expect(contractAddress).toBeDefined();
+
+    const state = await queryLedger(providers);
+    expect(state.min_gpa).toEqual(MIN_GPA);
+    expect(state.min_experience_months).toEqual(MIN_EXP_MONTHS);
+    expect(state.required_degree_code).toEqual(REQ_DEGREE_CODE);
+    expect(state.required_certification_code).toEqual(REQ_CERT_CODE);
+    expect(state.is_active).toBe(true);
+    expect(state.qualified_count).toEqual(0n);
+    expect(state.max_applicants).toEqual(APPLICANT_LIMIT);
+    logger.info(`BlindHire deployed and verified on-chain at: ${contractAddress}`);
+  });
+
+  // Test 2: Valid candidate satisfies all criteria (GPA: 8.70, Exp: 24mo, Degree: CS, Cert: Node.js)
+  it('Verifies qualification for a candidate who satisfies all requirements', async () => {
+    const candidateId = new Uint8Array(crypto.randomBytes(32));
+
+    await submitCallTx(providers as any, {
+      compiledContract: compiledWithWitnesses({
+        candidate_credentials: (ctx: any) => [
+          ctx.privateState,
+          {
+            degree_code: 1n, // CS/IT
+            gpa_scaled: 870n, // 8.70 GPA
+            experience_months: 24n, // 2 years
+            certification_code: 101n, // Node.js
+            candidate_id: candidateId,
+          },
+        ],
+      }),
+      contractAddress,
+      circuitId: 'prove_qualification',
+      privateStateId: PRIVATE_STATE_ID,
+      args: [],
+    } as any);
+
+    const state = await queryLedger(providers);
+    expect(state.qualified_count).toEqual(1n);
+    logger.info('Privacy check passed: Candidate qualified without exposing 8.70 GPA or 24 months experience on-chain');
+  });
+
+  // Test 3: Nullifier prevents duplicate application with same candidate secret
+  it('Rejects duplicate qualification proof from the same candidate (nullifier check)', async () => {
+    const candidateId = new Uint8Array(crypto.randomBytes(32));
+
+    // First submission succeeds
+    await submitCallTx(providers as any, {
+      compiledContract: compiledWithWitnesses({
+        candidate_credentials: (ctx: any) => [
+          ctx.privateState,
+          {
+            degree_code: 1n,
+            gpa_scaled: 820n,
+            experience_months: 18n,
+            certification_code: 101n,
+            candidate_id: candidateId,
+          },
+        ],
+      }),
+      contractAddress,
+      circuitId: 'prove_qualification',
+      privateStateId: PRIVATE_STATE_ID,
+      args: [],
+    } as any);
+
+    // Second submission with exact same candidateId must fail
+    await expect(
+      submitCallTx(providers as any, {
+        compiledContract: compiledWithWitnesses({
+          candidate_credentials: (ctx: any) => [
+            ctx.privateState,
+            {
+              degree_code: 1n,
+              gpa_scaled: 820n,
+              experience_months: 18n,
+              certification_code: 101n,
+              candidate_id: candidateId,
+            },
+          ],
+        }),
+        contractAddress,
+        circuitId: 'prove_qualification',
+        privateStateId: PRIVATE_STATE_ID,
+        args: [],
+      } as any),
+    ).rejects.toThrow();
+  });
+
+  // Test 4: Rejects candidate with GPA below threshold (e.g. 6.80 < 7.50)
+  it('Rejects candidate whose GPA is below minimum threshold', async () => {
+    const candidateId = new Uint8Array(crypto.randomBytes(32));
+    await expect(
+      submitCallTx(providers as any, {
+        compiledContract: compiledWithWitnesses({
+          candidate_credentials: (ctx: any) => [
+            ctx.privateState,
+            {
+              degree_code: 1n,
+              gpa_scaled: 680n, // Below 750n
+              experience_months: 24n,
+              certification_code: 101n,
+              candidate_id: candidateId,
+            },
+          ],
 });
