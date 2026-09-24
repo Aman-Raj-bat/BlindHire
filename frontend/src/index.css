@@ -1,0 +1,46 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --bg-page: #09090b;
+    --bg-card: #111215;
+    --bg-card-subtle: #17181d;
+    --border-subtle: #1f2128;
+    --border-hover: #2e323d;
+    --text-primary: #f4f4f6;
+    --text-secondary: #92939e;
+    --text-muted: #5e606e;
+    --brand-accent: #00D284;
+    --brand-accent-glow: rgba(0, 210, 132, 0.12);
+  }
+
+  * {
+    border-color: #1f2128;
+  }
+
+  body {
+    background-color: #09090b;
+    color: #f4f4f6;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 210, 132, 0.05), transparent 70%),
+      radial-gradient(circle at 100% 100%, rgba(255, 255, 255, 0.015), transparent 40%);
+    background-attachment: fixed;
+  }
+
+  /* Accessible focus indicators */
+  :focus-visible {
+    outline: 2px solid #00D284;
+    outline-offset: 2px;
+  }
+
+  /* Custom subtle scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+}
