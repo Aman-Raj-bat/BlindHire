@@ -1,3 +1,4 @@
+// [UI] Glassmorphic modal styling
 import React, { useState } from 'react';
 import {
   ShieldCheck,
