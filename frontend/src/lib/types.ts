@@ -58,3 +58,58 @@ export type JobListing = {
   // ON-CHAIN SCREENING CRITERIA
   minGpa: number;
   minGpaScaled: bigint;
+  minExperienceMonths: bigint;
+  requiredDegreeCode: bigint;
+  requiredCertificationCode: bigint;
+  contractAddress: string;
+  deadlineUnix: bigint;
+  isActive: boolean;
+  qualifiedCount: number;
+  maxApplicants: number;
+
+  isContractBacked: boolean;
+};
+
+export type QualificationProofResult = {
+  txHash: string;
+  nullifierHex: string;
+  receiptCommitmentHex: string;
+  status: 'qualified' | 'disqualified';
+  timestamp: string;
+  jobId: string;
+  requirementsMet: {
+    degree: boolean;
+    gpa: boolean;
+    experience: boolean;
+    certification: boolean;
+  };
+};
+
+export type ApplicationRecord = {
+  id: string;
+  jobId: string;
+  jobTitle: string;
+  candidateAnonymousId: string; // e.g. "Candidate #A91F"
+  candidateNullifier: string;
+  txHash: string;
+  status: 'qualified' | 'disqualified';
+  appliedDate: string;
+  isDemoData: boolean;
+
+  // Selective Disclosure State (Controlled exclusively by the Candidate)
+  disclosureStatus: 'none' | 'requested' | 'granted' | 'declined';
+  disclosedIdentity?: {
+    fullName: string;
+    email: string;
+    githubUrl?: string;
+    portfolioUrl?: string;
+    universityName?: string;
+  };
+
+  verifiedChecks: {
+    degree: boolean;
+    gpa: boolean;
+    experience: boolean;
+    certification: boolean;
+  };
+};
