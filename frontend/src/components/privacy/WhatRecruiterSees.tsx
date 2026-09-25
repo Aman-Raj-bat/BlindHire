@@ -1,3 +1,4 @@
+// [UI] Refined hover state outlines
 import React, { useState } from 'react';
 import { ShieldCheck, Eye, EyeOff, Lock, CheckCircle2, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
