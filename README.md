@@ -1,5 +1,5 @@
 
-<!-- Step-by-step local development & testnet guide -->
+<!-- Architecture flow and ZK privacy model specs -->
 # BlindHire
 
 [![CI](https://github.com/Aman-Raj-bat/BlindHire/actions/workflows/ci.yaml/badge.svg)](https://github.com/Aman-Raj-bat/BlindHire/actions/workflows/ci.yaml)
