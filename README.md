@@ -1,5 +1,3 @@
-
-<!-- Architecture flow and ZK privacy model specs -->
 # BlindHire
 
 [![CI](https://github.com/Aman-Raj-bat/BlindHire/actions/workflows/ci.yaml/badge.svg)](https://github.com/Aman-Raj-bat/BlindHire/actions/workflows/ci.yaml)
@@ -72,9 +70,9 @@ Candidate (Browser)                      Midnight Network (Preprod)             
 │ - Generates ZK Proof   │   Tx: { proof, nullifier }                                              │
 └────────────────────────┘                                                                         │
                                                                                                    │
-┌──────────────────────────────────────────────────────────────────────────────────────────────────┴─────┐
+┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ OPTIONAL SELECTIVE DISCLOSURE (Upon explicit candidate approval after qualification verification)      │
-│ Candidate Name: Aman Raj | Contact: aman.raj@example.com | GitHub: https://github.com/aman-dev          │
+│ Candidate Name: Alex Rivera | Contact: alex.rivera@example.com | GitHub: https://github.com/alexrivera-dev   │
 └────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 

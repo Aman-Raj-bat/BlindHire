@@ -1,11 +1,11 @@
 import { JobListing, CandidateProfile, ApplicationRecord } from './types';
 
 export const DEFAULT_DEMO_CANDIDATE: CandidateProfile = {
-  fullName: 'Aman Raj',
-  email: 'aman.raj@example.com',
-  githubUrl: 'https://github.com/aman-dev',
-  portfolioUrl: 'https://amanraj.dev',
-  universityName: 'Indian Institute of Technology (IIT)',
+  fullName: 'Alex Rivera',
+  email: 'alex.rivera@example.com',
+  githubUrl: 'https://github.com/alexrivera-dev',
+  portfolioUrl: 'https://alexrivera.dev',
+  universityName: 'University Institute of Technology',
   degreeCode: 1, // Computer Science / IT
   gpa: 8.7,
   gpaScaled: 870,
@@ -113,11 +113,11 @@ export const INITIAL_APPLICATIONS: ApplicationRecord[] = [
     isDemoData: true,
     disclosureStatus: 'granted',
     disclosedIdentity: {
-      fullName: 'Aman Raj',
-      email: 'aman.raj@example.com',
-      githubUrl: 'https://github.com/aman-dev',
-      portfolioUrl: 'https://amanraj.dev',
-      universityName: 'Indian Institute of Technology (IIT)',
+      fullName: 'Alex Rivera',
+      email: 'alex.rivera@example.com',
+      githubUrl: 'https://github.com/alexrivera-dev',
+      portfolioUrl: 'https://alexrivera.dev',
+      universityName: 'University Institute of Technology',
     },
     verifiedChecks: {
       degree: true,

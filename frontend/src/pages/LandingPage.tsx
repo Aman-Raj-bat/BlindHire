@@ -213,7 +213,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ isDemoMode }) => {
             <div className="flex items-center gap-3">
               <span className="text-xs font-mono-tech text-[#5e606e]">Test Candidate:</span>
               <span className="px-2.5 py-1 rounded-lg bg-[#17181d] border border-[#22252b] text-xs font-mono-tech text-[#f4f4f6]">
-                Aman Raj (GPA 8.7 • 24mo Exp)
+                Alex Rivera (GPA 8.7 • 24mo Exp)
               </span>
             </div>
           </div>

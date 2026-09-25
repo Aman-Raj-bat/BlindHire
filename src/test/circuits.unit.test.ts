@@ -86,7 +86,7 @@ describe('BlindHire Zero-Knowledge Circuit Logic & Protocol Verification', () =>
     };
   };
 
-  // Test 5: Valid qualification proof (Candidate Aman)
+  // Test 5: Valid qualification proof (Candidate Alex)
   it('5. verifies complete qualification for a qualifying candidate (GPA 8.7, Exp 24mo, CS/IT, Node.js)', () => {
     const valid = evaluateQualification({
       gpa_scaled: 870n,

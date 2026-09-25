@@ -1,4 +1,3 @@
-// [UI] Refined hover state outlines
 import React, { useState } from 'react';
 import { ShieldCheck, Eye, EyeOff, Lock, CheckCircle2, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -150,11 +149,11 @@ export const WhatRecruiterSees: React.FC = () => {
                   </div>
                   <div className="p-2.5 rounded-lg bg-[#14151a] border border-[#1f2128] text-center">
                     <span className="text-[#5e606e] block text-[11px]">University Name</span>
-                    <span className="font-mono-tech text-[#92939e] filter blur-[3px] select-none">IIT Bombay</span>
+                    <span className="font-mono-tech text-[#92939e] filter blur-[3px] select-none">Metro Institute</span>
                   </div>
                   <div className="p-2.5 rounded-lg bg-[#14151a] border border-[#1f2128] text-center">
                     <span className="text-[#5e606e] block text-[11px]">Applicant Name</span>
-                    <span className="font-mono-tech text-[#92939e] filter blur-[3px] select-none">Aman Raj</span>
+                    <span className="font-mono-tech text-[#92939e] filter blur-[3px] select-none">Alex Rivera</span>
                   </div>
                 </div>
               </div>
@@ -172,13 +171,13 @@ export const WhatRecruiterSees: React.FC = () => {
               <div className="p-4 rounded-xl bg-[#6366f1]/10 border border-[#6366f1]/25 flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-[#f4f4f6] text-sm">Aman Raj</span>
+                    <span className="font-semibold text-[#f4f4f6] text-sm">Alex Rivera</span>
                     <span className="px-2 py-0.5 rounded text-[10px] font-mono-tech uppercase bg-[#6366f1]/20 text-[#a5b4fc]">
                       PRIVATE CREDENTIAL VAULT
                     </span>
                   </div>
                   <p className="text-xs text-[#92939e] mt-0.5">
-                    aman.raj@example.com • Indian Institute of Technology (IIT)
+                    alex.rivera@example.com • University Institute of Technology
                   </p>
                 </div>
                 <div className="text-right">
