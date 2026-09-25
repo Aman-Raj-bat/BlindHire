@@ -1,4 +1,4 @@
-// [UI] Glassmorphic modal styling
+// [A11y] Dialog ARIA attributes
 import React, { useState } from 'react';
 import {
   ShieldCheck,
