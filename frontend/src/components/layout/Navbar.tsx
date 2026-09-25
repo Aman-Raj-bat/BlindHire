@@ -1,4 +1,3 @@
-// [UI] Wallet pulse indicators
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Shield, Wallet, ChevronDown, Check, Menu, X, ExternalLink, Sparkles } from 'lucide-react';

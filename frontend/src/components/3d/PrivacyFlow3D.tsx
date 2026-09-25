@@ -1,4 +1,3 @@
-// [UI] Enhanced particle mouse interaction
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 

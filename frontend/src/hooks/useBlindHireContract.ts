@@ -1,4 +1,3 @@
-// [Hook] Enhanced error boundaries
 import { useState, useCallback } from 'react';
 import { CompiledContract } from '@midnight-ntwrk/compact-js';
 import { createUnprovenCallTx, submitTxAsync } from '@midnight-ntwrk/midnight-js-contracts';
