@@ -1,3 +1,5 @@
+
+<!-- Step-by-step local development & testnet guide -->
 # BlindHire
 
 [![CI](https://github.com/Aman-Raj-bat/BlindHire/actions/workflows/ci.yaml/badge.svg)](https://github.com/Aman-Raj-bat/BlindHire/actions/workflows/ci.yaml)
@@ -177,3 +179,79 @@ yarn compile
 yarn test
 ```
 *Runs the 10-test suite verifying pure circuits, deterministic nullifiers, threshold boundaries, and constraint rejections.*
+
+### Start Local Midnight Stack (Optional)
+```bash
+yarn env:up                  # Launch proof-server, indexer, and midnight-node
+npx vite-node scripts/wait-for-dust.ts  # Wait for dev DUST token accrual
+yarn test:local             # Execute on-chain integration tests
+yarn env:down               # Stop stack
+```
+
+### Launch Frontend Development Server
+```bash
+cd frontend
+npm run dev
+```
+Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+---
+
+## 10. Deployment
+
+### Midnight Preprod Contract Deployment
+You can deploy BlindHire to Midnight Preprod in two ways:
+
+1. **Browser-Based Admin Portal (Recommended on Windows):**
+   - Connect your 1AM or Lace wallet configured to **Preprod**
+   - Navigate to `/admin`
+   - Set initial criteria (e.g., GPA $\ge$ 7.50, Exp $\ge$ 12mo)
+   - Click **Deploy BlindHire to Preprod** and approve in the extension popup.
+
+2. **Headless CLI Deployment Script:**
+   ```bash
+   cp .env.preprod.example .env.preprod
+   # Populate MIDNIGHT_PREPROD_MNEMONIC with funded testnet wallet
+   npx vite-node scripts/deploy.ts
+   ```
+
+### Preprod Contract Address
+- **Active Preprod Contract:** `0x12a84b9f390021c60bb54209fae017290a3c2b184019a9f24bca81903e198421`
+- **Explorer:** [https://preprod.midnightexplorer.com](https://preprod.midnightexplorer.com)
+
+### Production Vercel Deployment
+The repository includes production `vercel.json` configurations handling SPA rewrites and necessary Cross-Origin Embedder headers (`require-corp`, `same-origin`) for WebAssembly ZK operations:
+```bash
+npm run build --prefix frontend
+```
+
+---
+
+## 11. Test Coverage Overview
+
+| Test Case | Scenario | Expected Outcome |
+|---|---|---|
+| **Test 1** | Recruiter PK Derivation | Deterministic 32-byte public key generated via `persistentHash` |
+| **Test 2** | Anonymous Nullifiers | Distinct candidate secrets yield unique nullifiers (no identity leaks) |
+| **Test 3** | Double-Claim Prevention | Identical candidate secrets produce matching nullifier collisions |
+| **Test 4** | Qualification Receipt | Valid verifiable receipt commitment derived from nullifier |
+| **Test 5** | Complete Qualification | Candidate with GPA 8.7, 24mo Exp, CS degree, Node.js cert satisfies criteria |
+| **Test 6** | GPA Below Threshold | Candidate with GPA 6.90 (< 7.50) is rejected by ZK circuit |
+| **Test 7** | Insufficient Experience | Candidate with 8 months (< 12 months) is rejected by ZK circuit |
+| **Test 8** | Mismatched Degree | Mechanical Engineering applicant applying for CS/IT is rejected |
+| **Test 9** | Missing Certification | Applicant without Node.js certification code is rejected |
+| **Test 10**| Exact Boundary Values | Candidate at exact boundary (GPA 7.50, Exp 12mo) passes successfully |
+
+---
+
+## 12. Future Roadmap
+
+- **Institutional Issuer Attestation:** Native verification of decentralized identity (DID) credentials issued by universities.
+- **Multi-Role Smart Contracts:** Single contract orchestrating multiple concurrent screening benchmarks per enterprise.
+- **Encrypted Messaging Channel:** Shielded in-app communication between recruiters and anonymous qualified applicants prior to identity disclosure.
+
+---
+
+## 13. License
+
+MIT License. Built for the Midnight Network ecosystem.
