@@ -9,7 +9,6 @@ export default defineConfig({
     testTimeout: 10 * 60 * 1000,
     hookTimeout: 15 * 60 * 1000,
     include: ['src/test/**/*.test.ts'],
-    singleFork: true,
     fileParallelism: false,
   },
 });
