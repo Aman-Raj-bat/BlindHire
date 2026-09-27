@@ -1,202 +1,34 @@
 import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import {
-  ShieldCheck,
-  Building2,
-  MapPin,
-  Clock,
-  ArrowLeft,
-  ArrowRight,
-  ExternalLink,
-  CheckCircle2,
-  Lock,
-  Layers,
-  Sparkles,
-} from 'lucide-react';
-import { storage } from '../lib/storage';
-import { DEGREE_CODES, CERTIFICATION_CODES } from '../lib/types';
+import { Link, useParams } from 'react-router-dom';
+import { ArrowLeft, ArrowRight, CheckCircle2, Clock, ExternalLink, MapPin, ShieldCheck } from 'lucide-react';
 import { ProofGeneratorModal } from '../components/candidate/ProofGeneratorModal';
+import { storage } from '../lib/storage';
+import { CERTIFICATION_CODES, DEGREE_CODES } from '../lib/types';
 
-interface JobDetailPageProps {
-  isDemoMode: boolean;
-}
+interface JobDetailPageProps { isDemoMode: boolean; }
 
 export const JobDetailPage: React.FC<JobDetailPageProps> = ({ isDemoMode }) => {
   const { id } = useParams<{ id: string }>();
-  const jobs = storage.getJobs();
+  const job = storage.getJobs().find((item) => item.id === id) || storage.getJobs()[0];
   const candidate = storage.getCandidateProfile();
-  const job = jobs.find((j) => j.id === id) || jobs[0];
-
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // Compare criteria with candidate
-  const meetsGpa = candidate.gpa >= job.minGpa;
-  const meetsExp = candidate.experienceMonths >= Number(job.minExperienceMonths);
-  const meetsDegree = candidate.degreeCode === Number(job.requiredDegreeCode);
-  const meetsCert =
-    job.requiredCertificationCode === 0n ||
-    candidate.certificationCode === Number(job.requiredCertificationCode);
+  const checks = [
+    ['Minimum GPA', `≥ ${job.minGpa.toFixed(1)} / 10.0`, candidate.gpa >= job.minGpa],
+    ['Minimum experience', `≥ ${Number(job.minExperienceMonths)} months`, candidate.experienceMonths >= Number(job.minExperienceMonths)],
+    ['Degree field', DEGREE_CODES[Number(job.requiredDegreeCode)], candidate.degreeCode === Number(job.requiredDegreeCode)],
+    ['Certification', CERTIFICATION_CODES[Number(job.requiredCertificationCode)], job.requiredCertificationCode === 0n || candidate.certificationCode === Number(job.requiredCertificationCode)],
+  ] as const;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      {/* Back to Jobs */}
-      <Link
-        to="/jobs"
-        className="inline-flex items-center gap-1.5 text-xs font-mono-tech text-[#92939e] hover:text-[#f4f4f6] transition-colors"
-      >
-        <ArrowLeft className="w-3.5 h-3.5" />
-        <span>Back to All Screening Roles</span>
-      </Link>
-
-      {/* Main Header Card */}
-      <div className="p-8 rounded-2xl border border-[#1f2128] bg-[#111215] space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1f2128] pb-6">
-          <div className="space-y-1">
-            <span className="text-xs font-mono-tech uppercase text-[#00D284]">{job.company}</span>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#f4f4f6]">{job.title}</h1>
-            <div className="flex flex-wrap gap-3 text-xs text-[#92939e] pt-2">
-              <span className="inline-flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-[#5e606e]" />
-                {job.location}
-              </span>
-              <span className="inline-flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-[#5e606e]" />
-                {job.type}
-              </span>
-              <span className="inline-flex items-center gap-1 font-mono-tech text-[#00D284]">
-                {job.salaryRange}
-              </span>
-            </div>
-          </div>
-
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-semibold bg-[#00D284] hover:bg-[#00b872] text-[#09090b] transition-all shadow-[0_0_20px_rgba(0,210,132,0.2)] self-start sm:self-center shrink-0"
-          >
-            <span>Prove Qualification</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        {/* Screening Criteria Breakdown */}
-        <div className="space-y-3">
-          <h3 className="text-xs font-mono-tech uppercase tracking-wider text-[#92939e]">
-            On-Chain Zero-Knowledge Screening Thresholds
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl border border-[#1f2128] bg-[#14151a] flex items-center justify-between">
-              <div>
-                <p className="text-xs text-[#5e606e]">Minimum GPA</p>
-                <p className="text-sm font-semibold text-[#f4f4f6] font-mono-tech mt-0.5">
-                  &ge; {job.minGpa.toFixed(1)} / 10.0
-                </p>
-              </div>
-              <span
-                className={`text-[10px] font-mono-tech px-2 py-0.5 rounded ${
-                  meetsGpa ? 'bg-[#00D284]/10 text-[#00D284]' : 'bg-red-500/10 text-red-400'
-                }`}
-              >
-                {meetsGpa ? 'SATISFIED' : 'UNMET'}
-              </span>
-            </div>
-
-            <div className="p-4 rounded-xl border border-[#1f2128] bg-[#14151a] flex items-center justify-between">
-              <div>
-                <p className="text-xs text-[#5e606e]">Minimum Experience</p>
-                <p className="text-sm font-semibold text-[#f4f4f6] font-mono-tech mt-0.5">
-                  &ge; {Number(job.minExperienceMonths)} months
-                </p>
-              </div>
-              <span
-                className={`text-[10px] font-mono-tech px-2 py-0.5 rounded ${
-                  meetsExp ? 'bg-[#00D284]/10 text-[#00D284]' : 'bg-red-500/10 text-red-400'
-                }`}
-              >
-                {meetsExp ? 'SATISFIED' : 'UNMET'}
-              </span>
-            </div>
-
-            <div className="p-4 rounded-xl border border-[#1f2128] bg-[#14151a] flex items-center justify-between">
-              <div>
-                <p className="text-xs text-[#5e606e]">Required Degree Field</p>
-                <p className="text-sm font-semibold text-[#f4f4f6] truncate max-w-[200px] mt-0.5">
-                  {DEGREE_CODES[Number(job.requiredDegreeCode)]}
-                </p>
-              </div>
-              <span
-                className={`text-[10px] font-mono-tech px-2 py-0.5 rounded ${
-                  meetsDegree ? 'bg-[#00D284]/10 text-[#00D284]' : 'bg-red-500/10 text-red-400'
-                }`}
-              >
-                {meetsDegree ? 'SATISFIED' : 'UNMET'}
-              </span>
-            </div>
-
-            <div className="p-4 rounded-xl border border-[#1f2128] bg-[#14151a] flex items-center justify-between">
-              <div>
-                <p className="text-xs text-[#5e606e]">Certification</p>
-                <p className="text-sm font-semibold text-[#f4f4f6] truncate max-w-[200px] mt-0.5">
-                  {CERTIFICATION_CODES[Number(job.requiredCertificationCode)]}
-                </p>
-              </div>
-              <span
-                className={`text-[10px] font-mono-tech px-2 py-0.5 rounded ${
-                  meetsCert ? 'bg-[#00D284]/10 text-[#00D284]' : 'bg-red-500/10 text-red-400'
-                }`}
-              >
-                {meetsCert ? 'SATISFIED' : 'UNMET'}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Contract Address Reference */}
-        <div className="p-4 rounded-xl border border-[#1f2128] bg-[#0c0d10] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-          <div>
-            <span className="text-[11px] font-mono-tech text-[#5e606e] block">
-              Midnight Compact Contract Address
-            </span>
-            <code className="text-xs font-mono-tech text-[#00D284] break-all">{job.contractAddress}</code>
-          </div>
-          <a
-            href={`https://preprod.midnightexplorer.com/contracts/${job.contractAddress}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-[#92939e] hover:text-[#f4f4f6] shrink-0"
-          >
-            <span>View Contract on Explorer</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
-        </div>
-      </div>
-
-      {/* Description & Responsibilities */}
-      <div className="p-8 rounded-2xl border border-[#1f2128] bg-[#111215] space-y-6">
-        <div className="space-y-3">
-          <h2 className="text-base font-bold text-[#f4f4f6]">Role Overview</h2>
-          <p className="text-xs sm:text-sm text-[#92939e] leading-relaxed">{job.description}</p>
-        </div>
-
-        <div className="space-y-3">
-          <h2 className="text-base font-bold text-[#f4f4f6]">Core Responsibilities</h2>
-          <ul className="space-y-2 text-xs sm:text-sm text-[#92939e]">
-            {job.responsibilities.map((resp, idx) => (
-              <li key={idx} className="flex items-start gap-2.5">
-                <span className="text-[#00D284] font-bold mt-0.5">•</span>
-                <span>{resp}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <ProofGeneratorModal
-        job={job}
-        candidate={candidate}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        isDemoMode={isDemoMode}
-      />
-    </div>
+    <div className="world-page"><div className="world-container max-w-5xl">
+      <Link to="/jobs" className="mb-7 inline-flex items-center gap-2 font-mono-tech text-xs font-bold uppercase tracking-[0.08em] text-[#6e7488] hover:text-[#d94d35]"><ArrowLeft size={14} aria-hidden="true" /> Back to role map</Link>
+      <section className="world-card p-6 md:p-9">
+        <div className="flex flex-col justify-between gap-6 border-b border-[#e8e2d6] pb-7 md:flex-row md:items-start"><div><p className="world-section-kicker">{job.company}</p><h1 className="world-page-title !text-5xl md:!text-7xl">{job.title}</h1><div className="mt-5 flex flex-wrap gap-4 text-xs text-[#6e7488]"><span className="inline-flex items-center gap-1"><MapPin size={13} aria-hidden="true" /> {job.location}</span><span className="inline-flex items-center gap-1"><Clock size={13} aria-hidden="true" /> {job.type}</span><span className="font-mono-tech text-[#3e5d15]">{job.salaryRange}</span></div></div><button type="button" className="world-button shrink-0" onClick={() => setIsModalOpen(true)}>Prove qualification <ArrowRight size={14} aria-hidden="true" /></button></div>
+        <div className="mt-8"><div className="flex items-center gap-2"><ShieldCheck size={17} className="text-[#d94d35]" aria-hidden="true" /><h2 className="world-card-title">On-chain screening thresholds</h2></div><div className="mt-4 grid gap-3 sm:grid-cols-2">{checks.map(([label, value, satisfied]) => <div key={label} className="flex items-center justify-between gap-3 rounded-lg border border-[#e8e2d6] bg-[#f6f2e9] p-4"><div><span className="block text-xs text-[#6e7488]">{label}</span><b className="mt-1 block text-sm text-[#11162b]">{value}</b></div><span className={`world-badge ${satisfied ? 'is-good' : 'is-warn'}`}>{satisfied && <CheckCircle2 size={11} aria-hidden="true" />}{satisfied ? 'satisfied' : 'unmet'}</span></div>)}</div></div>
+        <div className="mt-7 flex flex-col justify-between gap-3 border-t border-[#e8e2d6] pt-5 text-xs sm:flex-row sm:items-center"><code className="break-all font-mono-tech text-[#3e5d15]">{job.contractAddress}</code><a className="inline-flex shrink-0 items-center gap-1 text-[#6e7488] hover:text-[#d94d35]" href={`https://preprod.midnightexplorer.com/contracts/${job.contractAddress}`} target="_blank" rel="noreferrer">Explorer <ExternalLink size={12} aria-hidden="true" /></a></div>
+      </section>
+      <section className="mt-4 grid gap-4 md:grid-cols-2"><div className="world-card p-6"><p className="world-section-kicker">Role overview</p><p className="mt-3 text-sm leading-7 text-[#6e7488]">{job.description}</p></div><div className="world-card p-6"><p className="world-section-kicker">Core responsibilities</p><ul className="mt-3 grid gap-3 text-sm leading-6 text-[#6e7488]">{job.responsibilities.map((responsibility) => <li key={responsibility} className="flex gap-2"><span className="text-[#d94d35]">•</span>{responsibility}</li>)}</ul></div></section>
+      <ProofGeneratorModal job={job} candidate={candidate} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} isDemoMode={isDemoMode} />
+    </div></div>
   );
 };

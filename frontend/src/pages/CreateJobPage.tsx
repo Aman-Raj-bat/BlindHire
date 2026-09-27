@@ -1,15 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import {
-  Briefcase,
-  Save,
-  ArrowLeft,
-  ShieldCheck,
-  CheckCircle2,
-  Calendar,
-  Layers,
-  Sparkles,
-} from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AlertTriangle, ArrowLeft, ArrowUpRight, Briefcase, Save, ShieldCheck } from 'lucide-react';
 import { storage } from '../lib/storage';
 import { JobListing, DEGREE_CODES, CERTIFICATION_CODES } from '../lib/types';
 import { useToast } from '../contexts/ToastContext';
@@ -31,17 +22,19 @@ export const CreateJobPage: React.FC = () => {
   const [degreeCode, setDegreeCode] = useState<number>(1);
   const [certCode, setCertCode] = useState<number>(101);
   const [applicantLimit, setApplicantLimit] = useState<number>(100);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    setSaveError(null);
     if (!title.trim()) {
-      addToast('error', 'Missing Information', 'Please enter a job title.');
+      addToast('error', 'Missing information', 'Please enter a job title.');
       return;
     }
 
     const newJob: JobListing = {
       id: `job-${Date.now()}`,
-      title,
+      title: title.trim(),
       company,
       department,
       location,
@@ -58,199 +51,197 @@ export const CreateJobPage: React.FC = () => {
       minExperienceMonths: BigInt(minExpMonths),
       requiredDegreeCode: BigInt(degreeCode),
       requiredCertificationCode: BigInt(certCode),
-      contractAddress:
-        storage.getDeployedContractAddress() ||
-        '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join(''),
+      contractAddress: '',
       deadlineUnix: BigInt(Math.floor(Date.now() / 1000) + 60 * 24 * 60 * 60),
       isActive: true,
       qualifiedCount: 0,
       maxApplicants: applicantLimit,
-      isContractBacked: true,
+      isContractBacked: false,
     };
 
     storage.saveJob(newJob);
-    addToast('success', 'Screening Role Published!', 'Job requirements deployed to marketplace.');
+    // The storage API swallows write errors, so verify persistence before reporting success.
+    if (!storage.getJobs().some((job) => job.id === newJob.id)) {
+      const message = 'The role could not be saved in this browser. Your form is still here; no contract was deployed.';
+      setSaveError(message);
+      addToast('error', 'Local save failed', message);
+      return;
+    }
+
+    addToast('success', 'Local role saved', 'Saved in this browser only. No screening contract was deployed.');
     navigate('/recruiter');
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      {/* Back Link */}
-      <Link
-        to="/recruiter"
-        className="inline-flex items-center gap-1.5 text-xs font-mono-tech text-[#92939e] hover:text-[#f4f4f6] transition-colors"
-      >
-        <ArrowLeft className="w-3.5 h-3.5" />
-        <span>Back to Recruiter Portal</span>
-      </Link>
-
-      {/* Header */}
-      <div className="border-b border-[#1f2128] pb-6">
-        <div className="flex items-center gap-2">
-          <span className="px-2 py-0.5 rounded text-[10px] font-mono-tech uppercase bg-[#6366f1]/10 text-[#818cf8] border border-[#6366f1]/20">
-            Smart Contract Screening Criteria
-          </span>
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#f4f4f6] mt-1">
-          Create Privacy-Screened Job
-        </h1>
-        <p className="text-xs text-[#92939e] mt-1">
-          Define mathematical qualification criteria enforced by Midnight ZK circuits.
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Basic Details */}
-        <div className="p-6 rounded-2xl border border-[#1f2128] bg-[#111215] space-y-4">
-          <h2 className="text-sm font-bold text-[#f4f4f6]">Role Details</h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="sm:col-span-2">
-              <label className="text-xs text-[#92939e] block mb-1.5">Role Title</label>
-              <input
-                type="text"
-                placeholder="e.g. Senior Backend Systems Engineer"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#1f2128] bg-[#14151a] text-xs text-[#f4f4f6] focus:border-[#00D284]"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs text-[#92939e] block mb-1.5">Company / Protocol</label>
-              <input
-                type="text"
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#1f2128] bg-[#14151a] text-xs text-[#f4f4f6] focus:border-[#00D284]"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs text-[#92939e] block mb-1.5">Department</label>
-              <input
-                type="text"
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#1f2128] bg-[#14151a] text-xs text-[#f4f4f6] focus:border-[#00D284]"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs text-[#92939e] block mb-1.5">Location</label>
-              <input
-                type="text"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#1f2128] bg-[#14151a] text-xs text-[#f4f4f6] focus:border-[#00D284]"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs text-[#92939e] block mb-1.5">Compensation Range</label>
-              <input
-                type="text"
-                value={salaryRange}
-                onChange={(e) => setSalaryRange(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#1f2128] bg-[#14151a] text-xs text-[#f4f4f6] focus:border-[#00D284]"
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="text-xs text-[#92939e] block mb-1.5">Description</label>
-              <textarea
-                rows={3}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#1f2128] bg-[#14151a] text-xs text-[#f4f4f6] focus:border-[#00D284]"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Screening Criteria */}
-        <div className="p-6 rounded-2xl border border-[#1f2128] bg-[#111215] space-y-4">
-          <div className="flex items-center gap-2 border-b border-[#1f2128] pb-3">
-            <ShieldCheck className="w-4 h-4 text-[#00D284]" />
-            <h2 className="text-sm font-bold text-[#f4f4f6]">
-              Zero-Knowledge Verification Criteria
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="text-xs text-[#92939e] block mb-1.5">
-                Required Degree / Field
-              </label>
-              <select
-                value={degreeCode}
-                onChange={(e) => setDegreeCode(Number(e.target.value))}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#1f2128] bg-[#14151a] text-xs text-[#f4f4f6] focus:border-[#00D284]"
-              >
-                {Object.entries(DEGREE_CODES).map(([code, name]) => (
-                  <option key={code} value={code}>
-                    {name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="text-xs text-[#92939e] block mb-1.5">
-                Minimum Cumulative GPA Threshold
-              </label>
-              <input
-                type="number"
-                step="0.1"
-                min="0"
-                max="10"
-                value={minGpa}
-                onChange={(e) => setMinGpa(parseFloat(e.target.value) || 0)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#1f2128] bg-[#14151a] text-xs font-mono-tech text-[#f4f4f6] focus:border-[#00D284]"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs text-[#92939e] block mb-1.5">
-                Minimum Professional Experience (Months)
-              </label>
-              <input
-                type="number"
-                min="0"
-                max="240"
-                value={minExpMonths}
-                onChange={(e) => setMinExpMonths(parseInt(e.target.value, 10) || 0)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#1f2128] bg-[#14151a] text-xs font-mono-tech text-[#f4f4f6] focus:border-[#00D284]"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs text-[#92939e] block mb-1.5">
-                Required Certification
-              </label>
-              <select
-                value={certCode}
-                onChange={(e) => setCertCode(Number(e.target.value))}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#1f2128] bg-[#14151a] text-xs text-[#f4f4f6] focus:border-[#00D284]"
-              >
-                {Object.entries(CERTIFICATION_CODES).map(([code, name]) => (
-                  <option key={code} value={code}>
-                    {name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          className="flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-semibold bg-[#00D284] hover:bg-[#00b872] text-[#09090b] transition-all shadow-[0_0_20px_rgba(0,210,132,0.2)]"
+    <div className="world-page">
+      <div className="world-container max-w-5xl">
+        <Link
+          to="/recruiter"
+          className="mb-7 inline-flex min-h-11 items-center gap-2 font-mono-tech text-xs text-[#6e7488] transition-colors hover:text-[#11162b]"
         >
-          <Save className="w-4 h-4" />
-          <span>Publish Role to Screening Contract</span>
-        </button>
-      </form>
+          <ArrowLeft size={14} aria-hidden="true" /> Back to recruiter workspace
+        </Link>
+
+        <header className="world-page-header">
+          <div>
+            <p className="world-section-kicker">Recruiter studio / new role</p>
+            <h1 className="world-page-title">Create a role.<br />Lead with ability.</h1>
+            <p className="world-page-description">
+              Start with the work, then define the qualifications. Build a local role listing without collecting candidate identities.
+            </p>
+          </div>
+          <span className="world-badge is-warn shrink-0">Local demo listing</span>
+        </header>
+
+        <div className="mt-8 flex items-start gap-3 border border-[#d7a32466] bg-[#fff3cf] p-4 text-sm text-[#80530c]">
+          <AlertTriangle size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
+          <div>
+            <b className="block font-mono-tech text-xs uppercase tracking-[0.08em]">A local listing, not a deployment</b>
+            <p className="mt-1 leading-6">
+              This form saves to this browser only. It does not publish to a shared marketplace, deploy a contract, or update any on-chain screening criteria.
+            </p>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="mt-8 grid gap-5">
+          <section className="world-card p-6 md:p-8" aria-labelledby="role-details-title">
+            <div className="flex items-center gap-3 border-b border-[#e8e2d6] pb-5">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#ff7352] text-[#11162b]">
+                <Briefcase size={17} aria-hidden="true" />
+              </span>
+              <div>
+                <p className="world-section-kicker !mb-1">01 / The opportunity</p>
+                <h2 id="role-details-title" className="world-card-title">Tell candidates about the work</h2>
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-5 sm:grid-cols-2">
+              <label className="sm:col-span-2">
+                <span className="world-label">Role title / required</span>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Senior Backend Systems Engineer"
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                  className="world-input"
+                />
+              </label>
+              <label>
+                <span className="world-label">Company / protocol</span>
+                <input type="text" value={company} onChange={(event) => setCompany(event.target.value)} className="world-input" />
+              </label>
+              <label>
+                <span className="world-label">Department</span>
+                <input type="text" value={department} onChange={(event) => setDepartment(event.target.value)} className="world-input" />
+              </label>
+              <label>
+                <span className="world-label">Location</span>
+                <input type="text" value={location} onChange={(event) => setLocation(event.target.value)} className="world-input" />
+              </label>
+              <label>
+                <span className="world-label">Compensation range</span>
+                <input type="text" value={salaryRange} onChange={(event) => setSalaryRange(event.target.value)} className="world-input" />
+              </label>
+              <label className="sm:col-span-2">
+                <span className="world-label">Role description</span>
+                <textarea
+                  rows={4}
+                  value={description}
+                  onChange={(event) => setDescription(event.target.value)}
+                  className="world-input !py-3 leading-6"
+                />
+              </label>
+            </div>
+          </section>
+
+          <section className="world-card p-6 md:p-8" aria-labelledby="screening-criteria-title">
+            <div className="flex items-center gap-3 border-b border-[#e8e2d6] pb-5">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#c8ef83] text-[#11162b]">
+                <ShieldCheck size={17} aria-hidden="true" />
+              </span>
+              <div>
+                <p className="world-section-kicker !mb-1">02 / Qualification criteria</p>
+                <h2 id="screening-criteria-title" className="world-card-title">Set the bar, not the bias</h2>
+              </div>
+            </div>
+            <p className="mt-4 text-xs leading-6 text-[#6e7488]">These thresholds describe this local role. Saving them does not change a deployed circuit.</p>
+
+            <div className="mt-5 grid gap-5 sm:grid-cols-2">
+              <label>
+                <span className="world-label">Required degree / field</span>
+                <select value={degreeCode} onChange={(event) => setDegreeCode(Number(event.target.value))} className="world-input">
+                  {Object.entries(DEGREE_CODES).map(([code, name]) => <option key={code} value={code}>{name}</option>)}
+                </select>
+              </label>
+              <label>
+                <span className="world-label">Minimum GPA / out of 10</span>
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  step="0.1"
+                  min="0"
+                  max="10"
+                  value={minGpa}
+                  onChange={(event) => setMinGpa(parseFloat(event.target.value) || 0)}
+                  className="world-input font-mono-tech"
+                />
+              </label>
+              <label>
+                <span className="world-label">Minimum experience / months</span>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min="0"
+                  max="240"
+                  value={minExpMonths}
+                  onChange={(event) => setMinExpMonths(parseInt(event.target.value, 10) || 0)}
+                  className="world-input font-mono-tech"
+                />
+              </label>
+              <label>
+                <span className="world-label">Required certification</span>
+                <select value={certCode} onChange={(event) => setCertCode(Number(event.target.value))} className="world-input">
+                  {Object.entries(CERTIFICATION_CODES).map(([code, name]) => <option key={code} value={code}>{name}</option>)}
+                </select>
+              </label>
+              <label>
+                <span className="world-label">Applicant limit</span>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min="1"
+                  step="1"
+                  value={applicantLimit}
+                  onChange={(event) => setApplicantLimit(parseInt(event.target.value, 10) || 0)}
+                  className="world-input font-mono-tech"
+                />
+              </label>
+              <div className="flex items-center text-xs leading-6 text-[#6e7488]">
+                Full-time role · 60-day application window. The applicant limit is local metadata, not an on-chain cap.
+              </div>
+            </div>
+          </section>
+
+          <aside className="world-card-dark p-6 md:p-8">
+            <p className="font-mono-tech text-[0.65rem] uppercase tracking-[0.1em] text-[#ff7352]">Local today. On-chain separately.</p>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#aab2ca]">
+              A saved role has no screening contract attached. Testnet deployment is a separate admin action with its own parameters and wallet approval.
+            </p>
+            <Link to="/admin" className="mt-4 inline-flex min-h-11 items-center gap-2 text-xs font-semibold text-[#f6f2e9] hover:text-[#ff7352]">
+              Open deployment tools <ArrowUpRight size={14} aria-hidden="true" />
+            </Link>
+          </aside>
+
+          {saveError && <p role="alert" className="border border-[#d94d354d] bg-[#ff735214] p-4 text-sm leading-6 text-[#9b3625]">{saveError}</p>}
+
+          <div className="flex flex-wrap items-center gap-4 pt-2">
+            <button type="submit" className="world-button"><Save size={15} aria-hidden="true" /> Save local role</button>
+            <Link to="/recruiter" className="world-button-ghost">Cancel</Link>
+            <span className="text-xs text-[#6e7488]">No wallet signature. No on-chain transaction.</span>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
