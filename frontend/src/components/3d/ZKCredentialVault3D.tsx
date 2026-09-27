@@ -243,6 +243,7 @@ export const ZKCredentialVault3D: React.FC<ZKCredentialVault3DProps> = ({
     <div
       ref={mountRef}
       className={`relative w-full h-full min-h-[340px] cursor-grab active:cursor-grabbing overflow-hidden ${className}`}
+      role="img"
       aria-label="Interactive 3D representation of Zero-Knowledge Credential Vault"
     />
   );

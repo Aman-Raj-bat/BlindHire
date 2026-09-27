@@ -179,6 +179,7 @@ export const PrivacyFlow3D: React.FC<PrivacyFlow3DProps> = ({ className = '' }) 
     <div
       ref={mountRef}
       className={`w-full h-full min-h-[220px] overflow-hidden ${className}`}
+      role="img"
       aria-label="3D visualization of zero-knowledge privacy flow"
     />
   );
