@@ -1,124 +1,23 @@
 import React from 'react';
-import {
-  FileText,
-  Terminal,
-  Cpu,
-  Layers,
-  CheckCircle2,
-  ExternalLink,
-  Code,
-  ShieldAlert,
-} from 'lucide-react';
+import { Code2, FileCode, Lock, ShieldAlert, Terminal } from 'lucide-react';
 
 export const DocsPage: React.FC = () => {
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
-      <div className="border-b border-[#1f2128] pb-6 space-y-2">
-        <span className="text-xs font-mono-tech uppercase text-[#00D284]">Protocol Reference</span>
-        <h1 className="text-3xl font-extrabold text-[#f4f4f6]">BlindHire Documentation</h1>
-        <p className="text-xs text-[#92939e]">
-          Technical specification, contract API, circuit signatures, and developer workflow.
-        </p>
-      </div>
+    <div className="world-page"><div className="world-container max-w-5xl">
+      <header className="world-page-header"><div><p className="world-section-kicker">Protocol reference / open by design</p><h1 className="world-page-title">Read the<br />boundary.</h1><p className="world-page-description">The technical map for BlindHire: where witnesses live, what Compact proves, and what Midnight is allowed to remember.</p></div><span className="world-badge is-good"><Lock size={11} aria-hidden="true" /> zero leakage model</span></header>
+      <section className="mt-8 grid gap-4 md:grid-cols-3"><article className="world-card p-6"><ShieldAlert size={19} className="text-[#d94d35]" aria-hidden="true" /><h2 className="mt-8 font-['Space_Grotesk'] text-xl font-semibold tracking-[-0.05em]">Demo honestly</h2><p className="mt-3 text-sm leading-6 text-[#6e7488]">Browser-entered values are clearly labeled self-attested demo credentials. Production issuers can sign the same witness shape.</p></article><article className="world-card p-6"><FileCode size={19} className="text-[#d94d35]" aria-hidden="true" /><h2 className="mt-8 font-['Space_Grotesk'] text-xl font-semibold tracking-[-0.05em]">Prove locally</h2><p className="mt-3 text-sm leading-6 text-[#6e7488]">The `prove_qualification` circuit evaluates GPA, experience, degree, and certification without revealing their underlying values.</p></article><article className="world-card p-6"><Code2 size={19} className="text-[#d94d35]" aria-hidden="true" /><h2 className="mt-8 font-['Space_Grotesk'] text-xl font-semibold tracking-[-0.05em]">Publish minimally</h2><p className="mt-3 text-sm leading-6 text-[#6e7488]">The ledger stores thresholds, a nullifier, and an aggregate qualified count. It does not store the candidate profile.</p></article></section>
+      <section className="world-card mt-8 overflow-hidden p-6 md:p-8"><div className="flex items-center gap-3"><Code2 size={18} className="text-[#d94d35]" aria-hidden="true" /><div><p className="world-section-kicker !mb-1">Compact contract surface</p><h2 className="world-card-title">The public/private split</h2></div></div><pre className="mt-6 overflow-x-auto border border-[#252d4b] bg-[#0d1125] p-5 font-mono-tech text-[0.67rem] leading-7 text-[#aab2ca]"><code>{`export circuit prove_qualification(): [] {
+  const creds = candidate_credentials();
 
-      {/* Trust Model Documentation */}
-      <section className="space-y-4">
-        <h2 className="text-base font-bold text-[#f4f4f6] flex items-center gap-2">
-          <ShieldAlert className="w-4 h-4 text-amber-400" />
-          <span>Credential Trust Model</span>
-        </h2>
-        <div className="p-5 rounded-2xl border border-amber-500/20 bg-amber-500/5 text-xs text-[#92939e] space-y-2">
-          <p className="font-semibold text-amber-300">
-            Self-Attested Client Witnesses vs. Cryptographically Issued Credentials
-          </p>
-          <p className="leading-relaxed">
-            BlindHire distinguishes between <strong>DEMO CREDENTIALS</strong> (self-attested inputs stored in local browser state) and <strong>ISSUED CREDENTIALS</strong> (credentials signed by institutional issuers such as universities or credential registries).
-          </p>
-          <p className="leading-relaxed">
-            In development and hackathon demonstrations, the system honestly labels candidate inputs as demo credentials. The zero-knowledge mathematics and constraint evaluations remain identical.
-          </p>
-        </div>
-      </section>
+  assert(creds.gpa_scaled >= min_gpa);
+  assert(creds.experience_months >= min_experience_months);
+  assert(creds.degree_code == required_degree_code);
+  assert(creds.certification_code == required_certification_code);
 
-      {/* Contract Signatures */}
-      <section className="space-y-4">
-        <h2 className="text-base font-bold text-[#f4f4f6] flex items-center gap-2">
-          <Code className="w-4 h-4 text-[#00D284]" />
-          <span>Compact Contract Interface</span>
-        </h2>
-
-        <div className="p-5 rounded-2xl border border-[#1f2128] bg-[#111215] space-y-4 text-xs font-mono-tech">
-          <div>
-            <p className="text-[#5e606e]">Constructor Signature:</p>
-            <pre className="text-[#f4f4f6] mt-1 p-3 rounded-lg bg-[#0c0d10] border border-[#1f2128] overflow-x-auto">
-{`constructor(
-    initial_min_gpa: Uint<32>,
-    initial_min_experience_months: Uint<32>,
-    initial_degree_code: Uint<32>,
-    initial_cert_code: Uint<32>,
-    recruiter_admin_hash: Bytes<32>,
-    deadline: Uint<64>,
-    applicant_limit: Uint<32>
-)`}
-            </pre>
-          </div>
-
-          <div>
-            <p className="text-[#5e606e]">Circuit: prove_qualification</p>
-            <pre className="text-[#00D284] mt-1 p-3 rounded-lg bg-[#0c0d10] border border-[#1f2128] overflow-x-auto">
-{`export circuit prove_qualification(): []`}
-            </pre>
-            <p className="text-[11px] text-[#92939e] mt-1">
-              Evaluates witness credentials against ledger thresholds; inserts nullifier and updates total qualified count.
-            </p>
-          </div>
-
-          <div>
-            <p className="text-[#5e606e]">Circuit: update_job_requirements</p>
-            <pre className="text-[#a5b4fc] mt-1 p-3 rounded-lg bg-[#0c0d10] border border-[#1f2128] overflow-x-auto">
-{`export circuit update_job_requirements(
-    new_min_gpa: Uint<32>,
-    new_min_experience_months: Uint<32>,
-    new_degree_code: Uint<32>,
-    new_cert_code: Uint<32>,
-    new_deadline: Uint<64>,
-    new_max_applicants: Uint<32>,
-    new_active_status: Boolean
-): []`}
-            </pre>
-          </div>
-        </div>
-      </section>
-
-      {/* Developer Commands */}
-      <section className="space-y-4">
-        <h2 className="text-base font-bold text-[#f4f4f6] flex items-center gap-2">
-          <Terminal className="w-4 h-4 text-[#00D284]" />
-          <span>Local Development & Testing</span>
-        </h2>
-
-        <div className="space-y-3 text-xs font-mono-tech">
-          <div className="p-4 rounded-xl border border-[#1f2128] bg-[#111215]">
-            <p className="text-[#5e606e] mb-1"># Compile Compact contract and generate managed/ bindings:</p>
-            <code className="text-[#00D284]">yarn compile</code>
-          </div>
-
-          <div className="p-4 rounded-xl border border-[#1f2128] bg-[#111215]">
-            <p className="text-[#5e606e] mb-1"># Start local Midnight stack (proof-server, indexer, dev node):</p>
-            <code className="text-[#00D284]">yarn env:up</code>
-          </div>
-
-          <div className="p-4 rounded-xl border border-[#1f2128] bg-[#111215]">
-            <p className="text-[#5e606e] mb-1"># Execute Midnight integration test suite:</p>
-            <code className="text-[#00D284]">yarn test:local</code>
-          </div>
-
-          <div className="p-4 rounded-xl border border-[#1f2128] bg-[#111215]">
-            <p className="text-[#5e606e] mb-1"># Start frontend dev server:</p>
-            <code className="text-[#00D284]">cd frontend &amp;&amp; npm run dev</code>
-          </div>
-        </div>
-      </section>
-    </div>
+  // only the anonymous nullifier crosses the boundary
+  nullifiers.insert(disclose(makeNullifier(creds.candidate_id)));
+}`}</code></pre></section>
+      <section className="world-card-dark mt-8 p-6 md:p-8"><div className="flex items-center gap-3"><Terminal size={18} className="text-[#c8ef83]" aria-hidden="true" /><h2 className="font-['Space_Grotesk'] text-xl font-semibold tracking-[-0.05em] text-[#fffdf8]">Developer loop</h2></div><div className="mt-5 grid gap-3 font-mono-tech text-xs text-[#aab2ca] sm:grid-cols-3"><code className="border border-[#ffffff1f] bg-[#151b36] p-4 text-[#c8ef83]">yarn compile</code><code className="border border-[#ffffff1f] bg-[#151b36] p-4 text-[#c8ef83]">yarn test</code><code className="border border-[#ffffff1f] bg-[#151b36] p-4 text-[#c8ef83]">cd frontend && npm run dev</code></div></section>
+    </div></div>
   );
 };
