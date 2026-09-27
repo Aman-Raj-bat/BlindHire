@@ -13,6 +13,9 @@ compactc_linux/
 err_*.log
 out_*.log
 .DS_Store
+.agents/
+__agent__/
+skills-lock.json
 
 # CRITICAL: DO NOT ignore frontend/src/managed/ or frontend/public/managed/
 # They must be committed so frontend can build in CI without requiring compact compiler!
