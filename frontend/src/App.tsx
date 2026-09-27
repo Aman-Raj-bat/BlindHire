@@ -26,12 +26,16 @@ export function App() {
     <WalletProvider>
       <ToastProvider>
         <BrowserRouter>
-          <div className="min-h-screen flex flex-col bg-[#09090b] text-[#f4f4f6]">
+          <div className="app-shell flex min-h-screen flex-col">
+            <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-[#11162b] focus:px-4 focus:py-3 focus:text-sm focus:font-bold focus:text-[#fffdf8]">
+              Skip to main content
+            </a>
+
             {/* Navigation */}
             <Navbar isDemoMode={isDemoMode} setIsDemoMode={setIsDemoMode} />
 
             {/* Main View Router */}
-            <main className="flex-1">
+            <main id="main-content" className="flex-1">
               <Routes>
                 <Route path="/" element={<LandingPage isDemoMode={isDemoMode} />} />
                 <Route path="/jobs" element={<JobsPage isDemoMode={isDemoMode} />} />
