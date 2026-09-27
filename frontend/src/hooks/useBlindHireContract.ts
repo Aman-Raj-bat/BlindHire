@@ -50,6 +50,17 @@ export function useBlindHireContract() {
       setErrorMsg(null);
       setLastTxId(null);
 
+      if (!useDemoMode && (!isConnected || !session)) {
+        setStatus('error');
+        setErrorMsg('Connect a Midnight wallet to submit a real proof, or enable Demo mode to try the local simulation.');
+        return null;
+      }
+      if (!useDemoMode && !job.isContractBacked) {
+        setStatus('error');
+        setErrorMsg('This is a local sample role, not a deployed screening contract. Enable Demo mode to preview qualification.');
+        return null;
+      }
+
       // Evaluate qualification constraints
       const meetsGpa = BigInt(candidate.gpaScaled) >= job.minGpaScaled;
       const meetsExp = BigInt(candidate.experienceMonths) >= job.minExperienceMonths;
@@ -78,7 +89,7 @@ export function useBlindHireContract() {
 
           const compiled = getCompiledContract();
 
-          const callTxData = await createUnprovenCallTx(session.providers as any, {
+          const callTxData = await (createUnprovenCallTx as any)(session.providers as any, {
             compiledContract: compiled,
             contractAddress,
             circuitId: 'prove_qualification',
@@ -131,7 +142,7 @@ export function useBlindHireContract() {
 
           return result;
         } catch (err: any) {
-          console.warn('On-chain circuit proof failed or wallet not funded, falling back to simulated ZK runner:', err);
+          console.warn('On-chain circuit proof failed:', err);
           // If contract call failed due to constraint or balance
           const msg = err?.message ?? String(err);
           if (msg.includes('assert') || msg.includes('below') || msg.includes('Missing')) {
@@ -140,10 +151,19 @@ export function useBlindHireContract() {
             addToast('error', 'Zero-Knowledge Circuit Constraint Failed', msg);
             return null;
           }
+          setStatus('error');
+          setErrorMsg(msg);
+          return null;
         }
       }
 
-      // Demo / Local ZK Execution Flow (Accurate representation with full cryptographic step transitions)
+      if (!useDemoMode) {
+        setStatus('error');
+        setErrorMsg('A deployed screening contract is required. No transaction was submitted.');
+        return null;
+      }
+
+      // Explicit local simulation only; never use this as a fallback for a failed transaction.
       setStatus('proving');
       setActiveStep(2);
       await new Promise((r) => setTimeout(r, 1200));
@@ -175,8 +195,8 @@ export function useBlindHireContract() {
       if (isOverallQualified) {
         addToast(
           'success',
-          'Zero-Knowledge Qualification Verified!',
-          `Verified across all 4 requirements without revealing private credentials.`,
+          'Demo criteria satisfied',
+          'Local simulation complete. No transaction was submitted to Midnight.',
         );
       } else {
         addToast(
