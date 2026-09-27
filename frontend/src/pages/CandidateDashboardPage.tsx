@@ -1,203 +1,92 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  ShieldCheck,
-  Lock,
-  Layers,
-  FileCheck,
-  CheckCircle2,
-  Clock,
-  ArrowRight,
-  UserCheck,
-  AlertCircle,
-  ExternalLink,
-} from 'lucide-react';
+import { ArrowRight, CheckCircle2, Lock, ShieldCheck, UserCheck } from 'lucide-react';
 import { storage } from '../lib/storage';
-import { DEGREE_CODES, CERTIFICATION_CODES } from '../lib/types';
+import { CERTIFICATION_CODES, DEGREE_CODES } from '../lib/types';
 
 export const CandidateDashboardPage: React.FC = () => {
   const [profile] = useState(storage.getCandidateProfile());
   const [applications] = useState(storage.getApplications());
-
-  const qualifiedCount = applications.filter((a) => a.status === 'qualified').length;
-  const disclosuresGranted = applications.filter((a) => a.disclosureStatus === 'granted').length;
+  const qualifiedCount = applications.filter((application) => application.status === 'qualified').length;
+  const disclosuresGranted = applications.filter((application) => application.disclosureStatus === 'granted').length;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
-      {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1f2128] pb-6">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono-tech uppercase bg-[#00D284]/10 text-[#00D284] border border-[#00D284]/20">
-              Candidate Screening Portal
-            </span>
+    <div className="world-page">
+      <div className="world-container">
+        <header className="world-page-header">
+          <div>
+            <p className="world-section-kicker">Candidate orbit / private workspace</p>
+            <h1 className="world-page-title">Your proof,<br />under your sky.</h1>
+            <p className="world-page-description">Manage the credentials that power your proofs, watch applications move through the constellation, and decide who gets a name after a qualification signal lands.</p>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#f4f4f6] mt-1">
-            Candidate Dashboard
-          </h1>
-          <p className="text-xs text-[#92939e] mt-1">
-            Manage your shielded credentials, monitor zero-knowledge proofs, and control disclosure requests.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Link
-            to="/candidate/credentials"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-[#14151a] hover:bg-[#1a1b22] text-[#f4f4f6] border border-[#22252b] transition-all"
-          >
-            <Lock className="w-3.5 h-3.5 text-[#00D284]" />
-            <span>Manage Credential Vault</span>
-          </Link>
-          <Link
-            to="/jobs"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-[#00D284] hover:bg-[#00b872] text-[#09090b] transition-all"
-          >
-            <span>Browse Jobs</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-      </div>
-
-      {/* KPI Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl border border-[#1f2128] bg-[#111215] space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-[#92939e]">Credential Vault</span>
-            <Lock className="w-4 h-4 text-[#00D284]" />
+          <div className="flex flex-wrap gap-2">
+            <Link to="/candidate/credentials" className="world-button-ghost"><Lock size={14} aria-hidden="true" /> Manage vault</Link>
+            <Link to="/jobs" className="world-button">Find a role <ArrowRight size={14} aria-hidden="true" /></Link>
           </div>
-          <p className="text-2xl font-bold font-mono-tech text-[#f4f4f6]">4 Credentials</p>
-          <p className="text-[11px] text-[#00D284]">100% Shielded Locally</p>
-        </div>
+        </header>
 
-        <div className="p-5 rounded-2xl border border-[#1f2128] bg-[#111215] space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-[#92939e]">Active Proofs</span>
-            <ShieldCheck className="w-4 h-4 text-[#00D284]" />
+        <section className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="Candidate metrics">
+          <article className="world-card world-kpi"><span className="world-section-kicker">Local vault</span><strong>04</strong><span>credentials held in browser-only witness state</span></article>
+          <article className="world-card world-kpi"><span className="world-section-kicker">Proofs sent</span><strong>{applications.length}</strong><span>{qualifiedCount} role signals verified by the circuit</span></article>
+          <article className="world-card world-kpi"><span className="world-section-kicker">Disclosures</span><strong>{disclosuresGranted}</strong><span>identities shared with explicit consent</span></article>
+          <article className="world-card world-kpi"><span className="world-section-kicker">Trust model</span><strong className="!mt-5 !text-[1.1rem]">{profile.isDemoCredential ? 'DEMO' : 'ISSUED'}</strong><span>{profile.isDemoCredential ? 'self-attested review profile' : 'verified issuer profile'}</span></article>
+        </section>
+
+        <section className="world-card mt-8 p-6 md:p-8">
+          <div className="flex flex-col justify-between gap-3 border-b border-[#e8e2d6] pb-5 sm:flex-row sm:items-start">
+            <div>
+              <p className="world-section-kicker">Private qualification profile</p>
+              <h2 className="world-card-title">The signal your vault can prove</h2>
+            </div>
+            <span className="world-badge is-good"><Lock size={11} aria-hidden="true" /> never public</span>
           </div>
-          <p className="text-2xl font-bold font-mono-tech text-[#f4f4f6]">{applications.length}</p>
-          <p className="text-[11px] text-[#92939e]">{qualifiedCount} roles qualified</p>
-        </div>
-
-        <div className="p-5 rounded-2xl border border-[#1f2128] bg-[#111215] space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-[#92939e]">Public Disclosures</span>
-            <UserCheck className="w-4 h-4 text-sky-400" />
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ['Degree / major', DEGREE_CODES[profile.degreeCode]],
+              ['GPA', `${profile.gpa.toFixed(2)} / 10.0`],
+              ['Experience', `${profile.experienceMonths} months`],
+              ['Certification', CERTIFICATION_CODES[profile.certificationCode]],
+            ].map(([label, value]) => (
+              <div key={label} className="rounded-lg border border-[#e8e2d6] bg-[#f6f2e9] p-4">
+                <span className="font-mono-tech text-[0.6rem] uppercase tracking-[0.08em] text-[#6e7488]">{label}</span>
+                <strong className="mt-2 block truncate text-sm text-[#11162b]">{value}</strong>
+              </div>
+            ))}
           </div>
-          <p className="text-2xl font-bold font-mono-tech text-[#f4f4f6]">{disclosuresGranted}</p>
-          <p className="text-[11px] text-[#92939e]">Candidate-consented</p>
-        </div>
+        </section>
 
-        <div className="p-5 rounded-2xl border border-[#1f2128] bg-[#111215] space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-[#92939e]">Trust Level</span>
-            <CheckCircle2 className="w-4 h-4 text-amber-400" />
+        <section className="mt-10">
+          <div className="mb-4 flex items-end justify-between gap-4">
+            <div><p className="world-section-kicker">Proof history</p><h2 className="world-card-title">Applications moving through the orbit</h2></div>
+            <Link to="/candidate/applications" className="font-mono-tech text-xs font-bold uppercase tracking-[0.08em] text-[#d94d35]">View all →</Link>
           </div>
-          <p className="text-sm font-bold font-mono-tech text-[#f4f4f6] mt-1">
-            {profile.isDemoCredential ? 'DEMO CREDENTIAL' : 'VERIFIED ISSUER'}
-          </p>
-          <p className="text-[11px] text-[#5e606e] truncate">{profile.credentialIssuer}</p>
-        </div>
-      </div>
-
-      {/* Your Qualification Profile Snapshot */}
-      <div className="p-6 rounded-2xl border border-[#1f2128] bg-[#111215] space-y-5">
-        <div className="flex items-center justify-between border-b border-[#1f2128] pb-4">
-          <div className="flex items-center gap-2.5">
-            <Lock className="w-4 h-4 text-[#00D284]" />
-            <h2 className="text-sm font-bold text-[#f4f4f6]">Your Private Qualification Profile</h2>
+          <div className="world-table-wrap">
+            <table className="world-table">
+              <thead><tr><th>Role</th><th>Signal</th><th>Anonymous ID</th><th>Disclosure</th><th>Applied</th></tr></thead>
+              <tbody>
+                {applications.map((application) => (
+                  <tr key={application.id}>
+                    <td><strong className="text-[#11162b]">{application.jobTitle}</strong></td>
+                    <td><span className="world-badge is-good"><CheckCircle2 size={11} aria-hidden="true" /> qualified</span></td>
+                    <td className="font-mono-tech text-xs">{application.candidateAnonymousId}</td>
+                    <td>
+                      {application.disclosureStatus === 'granted' && <span className="world-badge is-good"><UserCheck size={11} aria-hidden="true" /> disclosed</span>}
+                      {application.disclosureStatus === 'requested' && <span className="world-badge is-warn">request pending</span>}
+                      {application.disclosureStatus === 'none' && <span className="world-badge is-muted"><Lock size={11} aria-hidden="true" /> shielded</span>}
+                    </td>
+                    <td className="font-mono-tech text-xs text-[#6e7488]">{application.appliedDate}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <span className="text-xs font-mono-tech text-[#5e606e]">
-            Evaluated in zero-knowledge • Never stored on public ledger
-          </span>
-        </div>
+        </section>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono-tech">
-          <div className="p-3.5 rounded-xl border border-[#1f2128] bg-[#14151a]">
-            <span className="text-[#5e606e] block text-[11px]">Degree / Major</span>
-            <span className="text-[#f4f4f6] font-semibold mt-1 block truncate">
-              {DEGREE_CODES[profile.degreeCode]}
-            </span>
-          </div>
-
-          <div className="p-3.5 rounded-xl border border-[#1f2128] bg-[#14151a]">
-            <span className="text-[#5e606e] block text-[11px]">Grade Point Average (GPA)</span>
-            <span className="text-[#f4f4f6] font-semibold mt-1 block">
-              {profile.gpa.toFixed(2)} / 10.0
-            </span>
-          </div>
-
-          <div className="p-3.5 rounded-xl border border-[#1f2128] bg-[#14151a]">
-            <span className="text-[#5e606e] block text-[11px]">Professional Experience</span>
-            <span className="text-[#f4f4f6] font-semibold mt-1 block">
-              {profile.experienceMonths} months ({(profile.experienceMonths / 12).toFixed(1)} yrs)
-            </span>
-          </div>
-
-          <div className="p-3.5 rounded-xl border border-[#1f2128] bg-[#14151a]">
-            <span className="text-[#5e606e] block text-[11px]">Certified Credential</span>
-            <span className="text-[#f4f4f6] font-semibold mt-1 block truncate">
-              {CERTIFICATION_CODES[profile.certificationCode]}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Applications Table */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-[#f4f4f6]">Active Screening Applications</h2>
-          <Link to="/candidate/applications" className="text-xs text-[#00D284] hover:underline font-mono-tech">
-            View All Applications &rarr;
-          </Link>
-        </div>
-
-        <div className="overflow-hidden rounded-2xl border border-[#1f2128] bg-[#111215]">
-          <table className="w-full text-left text-xs">
-            <thead className="border-b border-[#1f2128] bg-[#14151a] font-mono-tech text-[#5e606e]">
-              <tr>
-                <th className="py-3.5 px-4 font-medium">Role Title</th>
-                <th className="py-3.5 px-4 font-medium">Status</th>
-                <th className="py-3.5 px-4 font-medium">Anonymous ID</th>
-                <th className="py-3.5 px-4 font-medium">Disclosure Status</th>
-                <th className="py-3.5 px-4 font-medium text-right">Applied</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#1f2128]">
-              {applications.map((app) => (
-                <tr key={app.id} className="hover:bg-[#14151a]/50 transition-colors">
-                  <td className="py-3.5 px-4 font-semibold text-[#f4f4f6]">
-                    {app.jobTitle}
-                  </td>
-                  <td className="py-3.5 px-4">
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono-tech uppercase bg-[#00D284]/10 text-[#00D284] border border-[#00D284]/20">
-                      <CheckCircle2 className="w-3 h-3" />
-                      QUALIFIED
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-4 font-mono-tech text-[#92939e]">
-                    {app.candidateAnonymousId}
-                  </td>
-                  <td className="py-3.5 px-4">
-                    {app.disclosureStatus === 'granted' && (
-                      <span className="text-sky-400 font-mono-tech text-[11px]">Disclosed to Recruiter</span>
-                    )}
-                    {app.disclosureStatus === 'requested' && (
-                      <span className="text-amber-400 font-mono-tech text-[11px] animate-pulse">
-                        Disclosure Requested
-                      </span>
-                    )}
-                    {app.disclosureStatus === 'none' && (
-                      <span className="text-[#5e606e] font-mono-tech text-[11px]">100% Shielded</span>
-                    )}
-                  </td>
-                  <td className="py-3.5 px-4 text-right font-mono-tech text-[#5e606e]">
-                    {app.appliedDate}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <section className="world-card-dark mt-8 grid gap-5 p-6 md:grid-cols-[auto_1fr_auto] md:items-center md:p-7">
+          <div className="grid h-12 w-12 place-items-center rounded-full border border-[#c8ef83]/40 bg-[#c8ef83]/10 text-[#c8ef83]"><ShieldCheck size={21} aria-hidden="true" /></div>
+          <div><p className="font-mono-tech text-[0.62rem] uppercase tracking-[0.1em] text-[#c8ef83]">Candidate-controlled disclosure</p><p className="mt-2 max-w-2xl text-sm leading-6 text-[#aab2ca]">Qualification is not consent. A team can request your identity, but your vault never shares it automatically.</p></div>
+          <Link to="/candidate/applications" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[#ffffff33] px-4 text-xs font-bold text-[#fffdf8] hover:border-[#c8ef83] hover:text-[#c8ef83]">Review requests <ArrowRight size={14} aria-hidden="true" /></Link>
+        </section>
       </div>
     </div>
   );
