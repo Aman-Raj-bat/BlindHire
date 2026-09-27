@@ -1,19 +1,6 @@
-import React, { useState } from 'react';
-import {
-  ShieldCheck,
-  Lock,
-  ArrowRight,
-  CheckCircle2,
-  XCircle,
-  Loader2,
-  ExternalLink,
-  X,
-  FileCheck,
-  Cpu,
-  Send,
-  Sparkles,
-} from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowRight, CheckCircle2, Loader2, Lock, ShieldCheck, X, XCircle } from 'lucide-react';
 import { JobListing, CandidateProfile } from '../../lib/types';
 import { useBlindHireContract } from '../../hooks/useBlindHireContract';
 import { storage } from '../../lib/storage';
@@ -27,32 +14,37 @@ interface ProofGeneratorModalProps {
   isDemoMode?: boolean;
 }
 
-export const ProofGeneratorModal: React.FC<ProofGeneratorModalProps> = ({
-  job,
-  candidate,
-  isOpen,
-  onClose,
-  onSuccess,
-  isDemoMode = false,
-}) => {
+export const ProofGeneratorModal: React.FC<ProofGeneratorModalProps> = ({ job, candidate, isOpen, onClose, onSuccess, isDemoMode = false }) => {
   const { status, activeStep, lastTxId, errorMsg, proveQualification, reset } = useBlindHireContract();
   const [hasStarted, setHasStarted] = useState(false);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const navigate = useNavigate();
+  const busy = ['evaluating', 'proving', 'submitting'].includes(status);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (!isOpen) return;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    dialogRef.current?.showModal();
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      previousFocus?.focus();
+    };
+  }, [isOpen]);
 
-  const steps = [
-    { title: 'Read Job Requirements', desc: 'Query on-chain screening thresholds from Midnight contract', icon: FileCheck },
-    { title: 'Evaluate Private Credentials', desc: 'Check GPA, experience, degree, and certification inside local witness', icon: Lock },
-    { title: 'Generate Zero-Knowledge Proof', desc: 'Compute ZK proof of satisfying criteria without revealing values', icon: Cpu },
-    { title: 'Submit On-Chain Verification', desc: 'Broadcast proof and anonymous nullifier to Midnight network', icon: Send },
-    { title: 'Qualification Verified', desc: 'Permanent verifiable receipt recorded on public ledger', icon: CheckCircle2 },
-  ];
+  const handleClose = () => {
+    if (busy) return;
+    reset();
+    setHasStarted(false);
+    dialogRef.current?.close();
+    onClose();
+  };
 
-  const handleStartProof = async () => {
+  const handleStart = async () => {
     setHasStarted(true);
     const result = await proveQualification(job, candidate, isDemoMode);
-    if (result && result.status === 'qualified') {
-      // Record application in storage
+    if (result?.status === 'qualified') {
       storage.saveApplication({
         id: `app-${Date.now()}`,
         jobId: job.id,
@@ -70,166 +62,46 @@ export const ProofGeneratorModal: React.FC<ProofGeneratorModalProps> = ({
     }
   };
 
-  const handleModalClose = () => {
-    reset();
-    setHasStarted(false);
-    onClose();
-  };
+  if (!isOpen) return null;
+
+  const steps = [
+    ['Read the role', 'Load the public qualification thresholds.'],
+    ['Check the witnesses', 'Compare degree, GPA, experience, and certification.'],
+    [isDemoMode ? 'Simulate the proof' : 'Generate the proof', isDemoMode ? 'Preview the proving flow with self-attested demo data.' : 'Prepare the private circuit execution.'],
+    [isDemoMode ? 'Create a local receipt' : 'Submit to Midnight', isDemoMode ? 'No transaction is sent to the network.' : 'Submit the proof for network verification.'],
+    ['Qualification result', 'Keep your identity separate from the outcome.'],
+  ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl rounded-2xl border border-[#22252B] bg-[#111215] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-        {/* Modal Header */}
-        <div className="p-6 border-b border-[#1f2128] bg-[#14151a] flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#00D284]/10 border border-[#00D284]/30 flex items-center justify-center text-[#00D284]">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-semibold text-[#f4f4f6]">Generate Qualification Proof</h3>
-                {isDemoMode && (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono-tech bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                    DEMO MODE
-                  </span>
-                )}
-              </div>
-              <p className="text-xs text-[#92939e]">{job.title}</p>
-            </div>
-          </div>
-          <button
-            onClick={handleModalClose}
-            className="p-1.5 rounded-lg text-[#5e606e] hover:text-[#f4f4f6] hover:bg-[#1f2128] transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+    <dialog ref={dialogRef} className="proof-dialog" aria-labelledby="proof-title" aria-describedby="proof-description" onCancel={(event) => { event.preventDefault(); handleClose(); }}>
+      <header className="proof-header">
+        <div className="flex items-start gap-3">
+          <ShieldCheck className="mt-1 shrink-0 text-[#d94d35]" size={24} aria-hidden="true" />
+          <div><p className="world-section-kicker !mb-2">{isDemoMode ? 'Demo flight / simulated' : 'Midnight / preprod'}</p><h2 id="proof-title" className="world-card-title">Let your qualification speak.</h2><p id="proof-description" className="mt-2 text-sm text-[#6e7488]">{job.title}</p></div>
         </div>
-
-        {/* Modal Body */}
-        <div className="p-6 space-y-6 overflow-y-auto">
-          {/* Privacy Guarantee Banner */}
-          <div className="p-3.5 rounded-xl border border-[#1f2128] bg-[#0c0d10] flex items-start gap-3 text-xs">
-            <Lock className="w-4 h-4 text-[#00D284] mt-0.5 shrink-0" />
-            <div className="text-[#92939e]">
-              <span className="font-semibold text-[#f4f4f6]">Zero-Knowledge Privacy Guarantee: </span>
-              Your private credentials (exact GPA: {candidate.gpa}, experience: {candidate.experienceMonths}mo, university: {candidate.universityName}) remain inside your local witness. Only the mathematical truth that you satisfy the job threshold is verified on-chain.
-            </div>
-          </div>
-
-          {/* Stepper Progress */}
-          <div className="space-y-3">
-            {steps.map((step, idx) => {
-              const isCurrent = hasStarted && activeStep === idx && (status === 'evaluating' || status === 'proving' || status === 'submitting');
-              const isCompleted = hasStarted && (activeStep > idx || status === 'qualified');
-              const Icon = step.icon;
-
-              return (
-                <div
-                  key={step.title}
-                  className={`flex items-start gap-3.5 p-3 rounded-xl border transition-all ${
-                    isCurrent
-                      ? 'border-[#00D284]/40 bg-[#00D284]/5 shadow-[0_0_15px_rgba(0,210,132,0.06)]'
-                      : isCompleted
-                      ? 'border-[#1f2128] bg-[#14151a]'
-                      : 'border-transparent bg-[#111215] opacity-50'
-                  }`}
-                >
-                  <div className="mt-0.5 shrink-0">
-                    {isCurrent ? (
-                      <div className="w-6 h-6 rounded-full bg-[#00D284]/20 border border-[#00D284] flex items-center justify-center text-[#00D284]">
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      </div>
-                    ) : isCompleted ? (
-                      <div className="w-6 h-6 rounded-full bg-[#00D284]/20 border border-[#00D284] flex items-center justify-center text-[#00D284]">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                      </div>
-                    ) : (
-                      <div className="w-6 h-6 rounded-full bg-[#1b1d24] border border-[#282b36] flex items-center justify-center text-[#5e606e] font-mono-tech text-[10px]">
-                        0{idx + 1}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <p className={`text-xs font-medium ${isCurrent ? 'text-[#00D284]' : isCompleted ? 'text-[#f4f4f6]' : 'text-[#92939e]'}`}>
-                        {step.title}
-                      </p>
-                      {isCompleted && (
-                        <span className="text-[10px] font-mono-tech text-[#00D284] uppercase">VERIFIED</span>
-                      )}
-                    </div>
-                    <p className="text-[11px] text-[#5e606e] mt-0.5">{step.desc}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Result Outcome if Completed */}
-          {status === 'qualified' && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="p-4 rounded-xl border border-[#00D284]/30 bg-[#00D284]/10 text-center space-y-2"
-            >
-              <div className="inline-flex p-2 rounded-full bg-[#00D284]/20 text-[#00D284] mb-1">
-                <CheckCircle2 className="w-6 h-6" />
-              </div>
-              <h4 className="text-sm font-bold text-[#f4f4f6]">Qualified Before Identified!</h4>
-              <p className="text-xs text-[#92939e] max-w-md mx-auto">
-                Your zero-knowledge qualification receipt has been submitted to the screening contract. The recruiter sees that you meet all criteria while your private profile remains shielded.
-              </p>
-              {lastTxId && (
-                <div className="pt-2">
-                  <span className="text-[11px] font-mono-tech text-[#5e606e] block">Transaction Reference</span>
-                  <code className="text-[10px] font-mono-tech text-[#00D284] break-all">{lastTxId}</code>
-                </div>
-              )}
-            </motion.div>
-          )}
-
-          {status === 'disqualified' && (
-            <div className="p-4 rounded-xl border border-red-500/30 bg-red-500/10 text-center space-y-2">
-              <div className="inline-flex p-2 rounded-full bg-red-500/20 text-red-400 mb-1">
-                <XCircle className="w-6 h-6" />
-              </div>
-              <h4 className="text-sm font-bold text-red-300">Criteria Not Satisfied</h4>
-              <p className="text-xs text-[#92939e] max-w-md mx-auto">
-                Your private credentials did not meet the job requirements (GPA threshold, experience duration, degree field, or required certification).
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Modal Footer Controls */}
-        <div className="p-6 border-t border-[#1f2128] bg-[#14151a] flex items-center justify-between">
-          <button
-            onClick={handleModalClose}
-            className="px-4 py-2 rounded-xl text-xs font-medium text-[#92939e] hover:text-[#f4f4f6] transition-colors"
-          >
-            {status === 'qualified' || status === 'disqualified' ? 'Close' : 'Cancel'}
-          </button>
-
-          {!hasStarted && (
-            <button
-              onClick={handleStartProof}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold bg-[#00D284] hover:bg-[#00b872] text-[#09090b] transition-all shadow-[0_0_20px_rgba(0,210,132,0.2)]"
-            >
-              <span>Execute Zero-Knowledge Proof</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          )}
-
-          {status === 'qualified' && (
-            <button
-              onClick={handleModalClose}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold bg-[#f4f4f6] text-[#09090b] hover:bg-[#e4e4e7] transition-all"
-            >
-              View In Applications
-            </button>
-          )}
+        <button type="button" className="cosmic-icon-button shrink-0" aria-label="Close proof dialog" disabled={busy} onClick={handleClose}><X size={18} aria-hidden="true" /></button>
+      </header>
+      <div className="proof-body">
+        <p className="flex gap-3 rounded-lg border border-[#c8ef83] bg-[#c8ef83]/15 p-4 text-sm leading-6 text-[#3e5d15]"><Lock size={17} className="mt-1 shrink-0" aria-hidden="true" />{isDemoMode ? 'This is a local simulation, not an on-chain proof or issuer verification. Your demo profile is never sent to a recruiter.' : 'Only qualification claims belong on the ledger. Your name, university, and exact grades are not part of the public claim.'}</p>
+        <ol className="proof-steps" aria-label="Qualification progress">
+          {steps.map(([title, description], index) => {
+            const completed = hasStarted && (activeStep > index || status === 'qualified');
+            const current = hasStarted && activeStep === index && busy;
+            return <li key={title} className={current ? 'is-current' : completed ? 'is-complete' : ''} aria-current={current ? 'step' : undefined}><span className="proof-step-number" aria-hidden="true">{current ? <Loader2 size={16} className="animate-spin" /> : completed ? <CheckCircle2 size={16} /> : `0${index + 1}`}</span><div><strong>{title}</strong><p>{description}</p></div></li>;
+          })}
+        </ol>
+        <div aria-live="polite" aria-atomic="true">
+          {busy && <p className="text-sm text-[#6e7488]">{steps[activeStep]?.[0]}… Keep this window open until the process finishes.</p>}
+          {status === 'qualified' && <div className="proof-result is-success"><CheckCircle2 size={25} aria-hidden="true" /><h3>{isDemoMode ? 'Demo criteria satisfied.' : 'Qualification submitted.'}</h3><p>{isDemoMode ? 'A simulated receipt was saved to your local applications. No real transaction was submitted.' : 'Your qualification submission is recorded. Check the network explorer for final confirmation.'}</p>{lastTxId && <code>{lastTxId}</code>}</div>}
+          {status === 'disqualified' && <div className="proof-result is-error"><XCircle size={25} aria-hidden="true" /><h3>Not a match, still private.</h3><p>One or more requirements were not satisfied. Review the role criteria or update your local credentials.</p></div>}
+          {status === 'error' && <div className="proof-result is-error" role="alert"><XCircle size={25} aria-hidden="true" /><h3>The proof could not proceed.</h3><p>{errorMsg || 'Please check your wallet and try again.'}</p></div>}
         </div>
       </div>
-    </div>
+      <footer className="proof-footer">
+        <button type="button" className="world-button-ghost" disabled={busy} onClick={handleClose}>{hasStarted ? 'Close' : 'Cancel'}</button>
+        {(!hasStarted || status === 'error') && <button type="button" className="world-button" onClick={handleStart}>{isDemoMode ? 'Run demo proof' : 'Generate proof'} <ArrowRight size={14} aria-hidden="true" /></button>}
+        {status === 'qualified' && <button type="button" className="world-button" onClick={() => { handleClose(); navigate('/candidate/applications'); }}>View applications <ArrowRight size={14} aria-hidden="true" /></button>}
+      </footer>
+    </dialog>
   );
 };
