@@ -5,9 +5,10 @@
   "type": "module",
   "description": "BlindHire - Privacy-preserving candidate screening dApp on Midnight Network. Qualified before identified.",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=20.0.0"
   },
   "scripts": {
+    "build": "npm --prefix frontend run build",
     "compile": "node scripts/compile.cjs && node scripts/copy-managed.cjs",
     "test": "vitest run src/test/circuits.unit.test.ts",
     "test:integration": "cross-env NODE_OPTIONS='--experimental-vm-modules' vitest run src/test/blindhire.test.ts",
