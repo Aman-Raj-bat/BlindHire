@@ -4,9 +4,6 @@
   "private": true,
   "type": "module",
   "description": "BlindHire - Privacy-preserving candidate screening dApp on Midnight Network. Qualified before identified.",
-  "engines": {
-    "node": ">=20.0.0"
-  },
   "scripts": {
     "build": "npm --prefix frontend run build",
     "compile": "node scripts/compile.cjs && node scripts/copy-managed.cjs",
