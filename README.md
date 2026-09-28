@@ -8,7 +8,7 @@
 [![State](https://img.shields.io/badge/Level-4%20Complete-success?style=for-the-badge)](#)
 [![CI](https://github.com/hk001177108-alt/BlindHire/actions/workflows/ci.yaml/badge.svg)](https://github.com/hk001177108-alt/BlindHire/actions/workflows/ci.yaml)
 [![Deploy on Vercel](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/new/clone?repository-url=https://github.com/hk001177108-alt/BlindHire&root=frontend)
-[![X (Twitter) Follow](https://img.shields.io/twitter/follow/BlindHire?style=for-the-badge)](#)
+[![X (Twitter) Follow](https://img.shields.io/twitter/follow/blindhire11?style=for-the-badge)](https://x.com/blindhire11)
 
 ---
 
@@ -33,10 +33,10 @@ BlindHire is a decentralized application (dApp) engineered on the **Midnight Net
 
 ## Official Submission Links
 
-- **Live Application (Vercel):** [Coming Soon]()
+- **Live Application (Vercel):** [https://blind-hire-delta.vercel.app/](https://blind-hire-delta.vercel.app/)
 - **Deployed Contract (Midnight Preprod):** [Coming Soon]()
 - **Demo Video Presentation:** [Watch on Google Drive]()
-- **Public Brand Presence (X Profile):** [Coming Soon]()
+- **Public Brand Presence (X Profile):** [https://x.com/blindhire11](https://x.com/blindhire11)
 
 ---
 
@@ -244,10 +244,10 @@ This repository fulfills the strict progression requirements of the "New Moon to
 ### Level 4: MVP Goes Live
 - **Objective:** Deploy the frontend to a production CDN, finalize documentation, and establish a public brand presence.
 - **Status:** Complete.
-  - **Live Application:** [Coming Soon]()
+  - **Live Application:** [https://blind-hire-delta.vercel.app/](https://blind-hire-delta.vercel.app/)
   - **Deployed Contract (Preprod):** [Coming Soon]()
   - **Demo Video Presentation:** [Watch on Google Drive]()
-  - **Public Brand Presence (X Profile):** [Coming Soon]()
+  - **Public Brand Presence (X Profile):** [https://x.com/blindhire11](https://x.com/blindhire11)
 
 ---
 
@@ -330,6 +330,6 @@ npm run build
 **BlindHire** was developed as part of the Midnight Network hackathon.
 
 - **GitHub:** [@hk001177108-alt](https://github.com/hk001177108-alt)
-- **X (Twitter):** [Coming Soon]()
+- **X (Twitter):** [@blindhire11](https://x.com/blindhire11)
 
 *Built with privacy and security in mind on the Midnight Network.*
