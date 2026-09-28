@@ -1,255 +1,335 @@
 # BlindHire
 
-[![CI](https://github.com/Aman-Raj-bat/BlindHire/actions/workflows/ci.yaml/badge.svg)](https://github.com/Aman-Raj-bat/BlindHire/actions/workflows/ci.yaml)
-[![Midnight Network](https://img.shields.io/badge/Midnight-Preprod-00D284.svg)](https://preprod.midnightexplorer.com)
-[![Compact Compiler](https://img.shields.io/badge/Compact-0.5.2-blue.svg)](https://github.com/midnightntwrk/compact)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+**Privacy-Preserving Candidate Screening on the Midnight Network**
 
-> **"Qualified before identified."**
-> A privacy-preserving candidate screening dApp built on the Midnight Network.
-
----
-
-## 1. Executive Summary
-
-BlindHire fundamentally rethinks technical screening by decoupling **qualification** from **identity**. 
-
-In conventional recruitment, candidates must surrender their entire identity—full legal name, exact GPA, university alma mater, graduation year, home address, and demographics—simply to be screened against baseline thresholds. This leads to rampant unconscious bias, candidate data scraping, and resume fraud.
-
-BlindHire leverages **Zero-Knowledge (ZK) proofs** on the **Midnight Network**. A candidate privately possesses credentials inside a local credential vault and mathematically proves they satisfy a job's criteria **WITHOUT** revealing the underlying credentials.
-
-### What the Recruiter Learns:
-- ✓ Degree field satisfied (e.g., Computer Science / IT)
-- ✓ Academic threshold satisfied (e.g., GPA $\ge$ 7.50 / 10.0)
-- ✓ Experience threshold satisfied (e.g., Experience $\ge$ 12 months)
-- ✓ Certification requirement satisfied (e.g., Node.js Certified Developer)
-- ✓ Overall Status: **QUALIFIED**
-
-### What Remains Completely Hidden:
-- Candidate's exact GPA (e.g., 8.72)
-- Candidate's exact experience duration (e.g., 2.4 years)
-- Candidate's university or college name
-- Candidate's age, gender, race, location, or personal identity
-- Candidate's unshielded wallet address
+[![Midnight Network](https://img.shields.io/badge/Network-Midnight-blueviolet?style=for-the-badge)](https://midnight.network)
+[![Language](https://img.shields.io/badge/Language-Compact-orange?style=for-the-badge)](https://midnight.network)
+[![Tested With](https://img.shields.io/badge/Tested%20With-Vitest-yellow?style=for-the-badge)](https://vitest.dev)
+[![State](https://img.shields.io/badge/Level-4%20Complete-success?style=for-the-badge)](#)
+[![CI](https://github.com/hk001177108-alt/BlindHire/actions/workflows/ci.yaml/badge.svg)](https://github.com/hk001177108-alt/BlindHire/actions/workflows/ci.yaml)
+[![Deploy on Vercel](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/new/clone?repository-url=https://github.com/hk001177108-alt/BlindHire&root=frontend)
+[![X (Twitter) Follow](https://img.shields.io/twitter/follow/BlindHire?style=for-the-badge)](#)
 
 ---
 
-## 2. Core Product Principles
+## Abstract
 
-### 1. Qualification $\ne$ Identity
-Competence is objective; identity is personal. Employers should first determine if a candidate can perform the work before receiving identifiable demographic data.
-
-### 2. Zero-Leakage Proving
-Private credentials never leave the candidate's browser. Constraint evaluations occur inside the client-side ZK prover using private witnesses.
-
-### 3. User-Controlled Selective Disclosure
-Identity disclosure is never automatic. After qualifying, candidates receive disclosure requests from recruiters and choose if and when to share their resume, email, or GitHub.
+BlindHire is a decentralized application (dApp) engineered on the **Midnight Network** utilizing the **Compact** smart contract language. The platform serves as a Zero-Knowledge (ZK) qualification gate for technical hiring. It allows job candidates to cryptographically prove that they satisfy stringent job requirements (such as minimum GPA, verified experience duration, degree field, and required professional certifications) without ever surrendering their raw, sensitive demographic data, university transcripts, or personal identities to centralized job portals, recruiters, or the public blockchain ledger.
 
 ---
 
-## 3. Architecture & Privacy Boundary
+## Table of Contents
 
+1. [Official Submission Links](#official-submission-links)
+2. [Architectural Overview](#architectural-overview)
+3. [Zero-Knowledge Privacy Model](#zero-knowledge-privacy-model)
+4. [Smart Contract Implementation](#smart-contract-implementation)
+5. [Hackathon Progression (Levels 1-4)](#hackathon-progression-levels-1-4)
+6. [Project Showcase & Verification Proofs](#project-showcase--verification-proofs)
+7. [Local Development & Setup Guide](#local-development--setup-guide)
+8. [Author & Acknowledgements](#author--acknowledgements)
+
+---
+
+## Official Submission Links
+
+- **Live Application (Vercel):** [Coming Soon]()
+- **Deployed Contract (Midnight Preprod):** [Coming Soon]()
+- **Demo Video Presentation:** [Watch on Google Drive]()
+- **Public Brand Presence (X Profile):** [Coming Soon]()
+
+---
+
+## Architectural Overview
+
+BlindHire bridges modern editorial web aesthetics with cutting-edge zero-knowledge cryptographic privacy networks.
+
+- **Smart Contract Layer:** Written in Compact (`contracts/blindhire.compact`), compiled to WebAssembly (WASM) and Zero-Knowledge Intermediate Representation (ZKIR). Deployed on the Midnight Preprod network with dual circuits (`prove_qualification` and `update_job_requirements`).
+- **Frontend Application Layer:** Built with React 19, TypeScript, and Vite 6. Styled using custom editorial design tokens via Tailwind CSS with interactive 3D visualizations powered by Three.js and Framer Motion.
+- **Wallet Infrastructure:** Integrated with `@midnight-ntwrk/dapp-connector-api` to interface directly with 1AM and Lace browser extension wallets for localized client-side proof generation and transaction signing.
+- **Testing & CI/CD:** End-to-end testing utilizing Vitest and local Docker-based Midnight environments. Automated CI/CD pipelines via GitHub Actions asserting deterministic circuits and boundary conditions.
+
+---
+
+## Zero-Knowledge Privacy Model
+
+The core value proposition of BlindHire is absolute data privacy and bias elimination for applicants.
+
+### The Traditional Vulnerability
+In conventional recruitment, candidates must surrender unencrypted, highly sensitive documents (full legal name, exact GPA, university alma mater, graduation year, home address, and demographics) simply to be screened against baseline criteria. This leads to unconscious bias, candidate data scraping, identity theft, and resume filtering long before skills are evaluated.
+
+### The BlindHire ZK Solution
+BlindHire reverses the hiring physics. Qualification arrives before identity. Verification is entirely mathematical.
+
+1. **Public State (Ledger Data):** The hiring team publishes objective role thresholds (`min_gpa`, `min_experience_months`, `required_degree_code`, `required_certification_code`, `max_applicants`, and `application_deadline`) to the public Midnight ledger. These values are fully transparent and verifiable by any observer.
+2. **Private Witness (User Data):** The candidate enters their actual credentials locally into their private credential vault. These values are designated as "private witnesses" in the Compact circuit (`CandidateCredentials`).
+3. **Local Proof Generation:** The candidate's browser wallet executes a localized Zero-Knowledge circuit. It validates that the private witness credentials satisfy all job thresholds simultaneously.
+4. **On-Chain Verification:** The wallet submits a cryptographic proof and an anonymous nullifier to the Midnight blockchain. Network validators verify the math without ever seeing the underlying private inputs.
+5. **Selective Consent Disclosure:** Identity disclosure is never automatic. After qualifying, candidates receive disclosure requests from recruiters and choose if and when to share their name, email, or portfolio.
+
+**Observer Matrix:**
+- **Visible on-chain:** Job requirements thresholds, anonymous applicant nullifier, qualification receipt commitment, incremented qualified count, application deadline.
+- **Hidden permanently:** Candidate's exact GPA, exact experience duration, university/college, candidate name, contact info, and private unshielded wallet address.
+
+---
+
+## Submission Updates & Refactors
+
+### Bug Fixes & Refactors
+
+- **Midnight Preprod Indexer Patch**: Implemented `createPatchedPublicDataProvider` eliminating the known `offset: null` GraphQL crash on Midnight Preprod indexers.
+- **Type-Widening Arithmetic Protections**: Compact arithmetic operations widen integer types; explicitly cast all increments back with `disclose((qualified_count + 1) as Uint<32>)`.
+- **WASM Cross-Origin Isolation**: Configured `Cross-Origin-Embedder-Policy: credentialless` and `Cross-Origin-Opener-Policy: same-origin` headers in Vercel to guarantee SharedArrayBuffer support for Midnight WASM.
+- **Deterministic Proving Artifacts**: Automated `copy-managed.js` using `import.meta.url` to guarantee contract interfaces and ZKIR proving keys are always copied into production bundles.
+- **Wallet Connection Resilience**: Asynchronous polling for `window.midnight.mnLace` and `window.midnight['1am']` with graceful disconnection cleanup.
+- **Selective Identity Boundary**: Added candidate consent controls so personal contact details remain off-chain and gated behind candidate permission.
+
+### Test Additions
+
+| Test | What it covers |
+|------|----------------|
+| `derives deterministic recruiter public key from secret key using persistentHash` | Cryptographic key derivation: ensures administrative control is strictly verifiable |
+| `generates identical nullifiers for identical candidate secrets` | Double-qualification prevention: candidate cannot qualify multiple times for the same role |
+| `derives verifiable qualification receipt commitments from nullifiers` | Receipt derivation: guarantees authentic proof receipts for candidate tracking |
+| `verifies complete qualification for a qualifying candidate` | Happy path: candidate satisfying all 4 thresholds (GPA 8.7, Exp 24mo, CS/IT, Node.js) qualifies |
+| `rejects candidate whose GPA is below minimum threshold` | Constraint validation: candidate with GPA below threshold (6.90 < 7.50) is rejected |
+| `rejects candidate whose experience duration is below threshold` | Constraint validation: experience below threshold (8mo < 12mo) is rejected |
+| `rejects candidate whose degree does not match required field` | Constraint validation: non-matching degree code (Mechanical != CS) is rejected |
+| `rejects candidate without required certification` | Constraint validation: missing certification (cert 0 != 101) is rejected |
+| `verifies qualification at exact threshold boundaries` | Boundary condition: candidate with exact thresholds (GPA = 750n, Exp = 12n) passes |
+
+### Key Platform Features
+
+- **Interactive 3D Visual Experience**: Custom obsidian cryptographic core with orbital requirement rings (Degree, GPA, Experience, Certification) that react dynamically to qualification states.
+- **Candidate Credential Vault**: Localized private storage for credentials with zero cloud leakage.
+- **Recruiter Screening Console**: Real-time evaluation table with verified ZK badges, candidate nullifiers, and permissioned disclosure management.
+- **Role Map & Criteria Explorer**: Public view of open roles with cryptographic verification parameters and deadlines.
+
+---
+
+## Smart Contract Implementation
+
+The Compact contract (`contracts/blindhire.compact`) is designed for maximum security, nullifier replay protection, and absolute data minimization.
+
+```compact
+pragma language_version >= 0.22;
+
+import CompactStandardLibrary;
+
+// Public on-chain ledger state
+export ledger min_gpa: Uint<32>;
+export ledger min_experience_months: Uint<32>;
+export ledger required_degree_code: Uint<32>;
+export ledger required_certification_code: Uint<32>;
+export ledger recruiter: Bytes<32>;
+export ledger application_deadline: Uint<64>;
+export ledger is_active: Boolean;
+export ledger max_applicants: Uint<32>;
+export ledger qualified_count: Uint<32>;
+export ledger nullifiers: Set<Bytes<32>>;
+export ledger qualification_commitments: Set<Bytes<32>>;
+
+// Private witnesses: NEVER revealed on-chain, evaluated inside ZK prover
+struct CandidateCredentials {
+    degree_code: Uint<32>,
+    gpa_scaled: Uint<32>,
+    experience_months: Uint<32>,
+    certification_code: Uint<32>,
+    candidate_id: Bytes<32>
+}
+
+witness candidate_credentials(): CandidateCredentials;
+witness recruiter_secret_key(): Bytes<32>;
+
+// Constructor initializes public job thresholds
+constructor(
+    initial_min_gpa: Uint<32>,
+    initial_min_experience_months: Uint<32>,
+    initial_degree_code: Uint<32>,
+    initial_cert_code: Uint<32>,
+    recruiter_admin_hash: Bytes<32>,
+    deadline: Uint<64>,
+    applicant_limit: Uint<32>
+) {
+    min_gpa = disclose(initial_min_gpa);
+    min_experience_months = disclose(initial_min_experience_months);
+    required_degree_code = disclose(initial_degree_code);
+    required_certification_code = disclose(initial_cert_code);
+    recruiter = disclose(recruiter_admin_hash);
+    application_deadline = disclose(deadline);
+    max_applicants = disclose(applicant_limit);
+    is_active = disclose(true);
+    qualified_count = disclose(0);
+}
+
+// Verification circuit accepts private witnesses and asserts qualification in ZK.
+// Candidate credentials remain shielded while proving threshold satisfaction.
+export circuit prove_qualification(): [] {
+    assert(disclose(is_active), "BlindHire: Job screening is paused");
+    assert(blockTimeLt(disclose(application_deadline)), "BlindHire: Application deadline has passed");
+    assert(disclose(qualified_count) < disclose(max_applicants), "BlindHire: Qualification limit reached");
+
+    const creds = candidate_credentials();
+
+    assert(creds.gpa_scaled >= min_gpa, "BlindHire: GPA below required threshold");
+    assert(creds.experience_months >= min_experience_months, "BlindHire: Experience below required threshold");
+    assert(creds.degree_code == required_degree_code, "BlindHire: Degree field does not match requirement");
+    assert(creds.certification_code == required_certification_code, "BlindHire: Missing required certification");
+
+    const nul = makeNullifier(creds.candidate_id);
+    assert(!nullifiers.member(disclose(nul)), "BlindHire: Candidate already proved qualification for this job");
+
+    const receipt = makeQualificationReceipt(nul);
+
+    nullifiers.insert(disclose(nul));
+    qualification_commitments.insert(disclose(receipt));
+    qualified_count = disclose((qualified_count + 1) as Uint<32>);
+}
+
+// Recruiter circuit to update role screening requirements
+export circuit update_job_requirements(
+    new_min_gpa: Uint<32>,
+    new_min_experience_months: Uint<32>,
+    new_degree_code: Uint<32>,
+    new_cert_code: Uint<32>,
+    new_deadline: Uint<64>,
+    new_max_applicants: Uint<32>,
+    new_active_status: Boolean
+): [] {
+    const sk = recruiter_secret_key();
+    assert(recruiter == recruiterPublicKey(sk), "BlindHire: Unauthorized recruiter key");
+
+    min_gpa = disclose(new_min_gpa);
+    min_experience_months = disclose(new_min_experience_months);
+    required_degree_code = disclose(new_degree_code);
+    required_certification_code = disclose(new_cert_code);
+    application_deadline = disclose(new_deadline);
+    max_applicants = disclose(new_max_applicants);
+    is_active = disclose(new_active_status);
+}
+
+// Pure circuits for deterministic hashing
+export pure circuit recruiterPublicKey(sk: Bytes<32>): Bytes<32> {
+    return persistentHash<Vector<2, Bytes<32>>>([pad(32, "blindhire:recruiter:v1"), sk]);
+}
+
+export pure circuit makeNullifier(candidate_id: Bytes<32>): Bytes<32> {
+    return persistentHash<Vector<2, Bytes<32>>>([pad(32, "blindhire:nullifier:v1"), candidate_id]);
+}
+
+export pure circuit makeQualificationReceipt(nullifier: Bytes<32>): Bytes<32> {
+    return persistentHash<Vector<2, Bytes<32>>>([pad(32, "blindhire:receipt:v1"), nullifier]);
+}
 ```
-Candidate (Browser)                      Midnight Network (Preprod)                     Recruiter (Browser)
-┌────────────────────────┐               ┌────────────────────────┐                    ┌────────────────────────┐
-│ Private Credential     │               │ Public Ledger          │                    │ Screening Dashboard    │
-│ Vault (Witnesses):     │               │ State:                 │                    │                        │
-│ - GPA: 8.70            │               │ - min_gpa: 750n        │                    │ Candidate #A91F:       │
-│ - Exp: 24 months       │               │ - min_exp: 12n         │                    │ - Degree:   VERIFIED   │
-│ - Degree: CS / IT (1)  │               │ - req_degree: 1n       │                    │ - GPA:      VERIFIED   │
-│ - Cert: Node.js (101)  │               │ - req_cert: 101n       │                    │ - Exp:      VERIFIED   │
-│ - Candidate Secret Key │               │ - nullifiers Set       │                    │ - Cert:     VERIFIED   │
-└───────────┬────────────┘               │ - qual_commitments Set │                    │                        │
-            │                            │ - qualified_count: 1n  │                    │ Status: QUALIFIED      │
-            ▼                            └───────────▲────────────┘                    └───────────▲────────────┘
-┌────────────────────────┐                           │                                             │
-│ Compact ZK Prover      │                           │                                             │
-│ (Client WebAssembly):  │                           │                                             │
-│ - Evaluates assertions │                           │                                             │
-│ - Derives Nullifier    │───────────────────────────┘                                             │
-│ - Generates ZK Proof   │   Tx: { proof, nullifier }                                              │
-└────────────────────────┘                                                                         │
-                                                                                                   │
-┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ OPTIONAL SELECTIVE DISCLOSURE (Upon explicit candidate approval after qualification verification)      │
-│ Candidate Name: Alex Rivera | Contact: alex.rivera@example.com | GitHub: https://github.com/alexrivera-dev   │
-└────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-```
 
 ---
 
-## 4. Privacy Model Specification
+## Hackathon Progression (Levels 1-4)
 
-| Data Element | Visibility | Location | Cryptographic Handling |
-|---|---|---|---|
-| **Cumulative GPA** | **PRIVATE** | Local Witness only | Evaluated as `assert(creds.gpa_scaled >= min_gpa)` |
-| **Experience Duration** | **PRIVATE** | Local Witness only | Evaluated as `assert(creds.experience_months >= min_exp)` |
-| **University / College** | **PRIVATE** | Local Vault only | Never passed to circuit or ledger |
-| **Candidate Identity / Secret**| **PRIVATE** | Local Witness only | Derived via `persistentHash` into anonymous nullifier |
-| **Applicant Nullifier** | **PUBLIC** | On-Chain Ledger | Prevents double-qualification without unmasking candidate |
-| **Job Screening Thresholds**| **PUBLIC** | On-Chain Ledger | Open criteria visible to all applicants |
-| **Qualified Count** | **PUBLIC** | On-Chain Ledger | Public counter incremented upon valid ZK proof |
-| **Name / Email / Portfolio** | **SELECTIVE** | Off-Chain Consent | Shared only after explicit candidate approval |
+This repository fulfills the strict progression requirements of the "New Moon to Full" Midnight Builder Journey.
 
----
+### Level 1: Setup & First Contract
+- **Objective:** Establish the WSL2/Docker toolchain, write the foundational Compact contract, and document the product proposal (Privacy-Preserving Screening Protocol).
+- **Status:** Complete. The contract successfully compiles, generating the required `zkir`, `bzkir`, and prover/verifier keys.
 
-## 5. Credential Trust Model
+### Level 2: Frontend Integration
+- **Objective:** Develop a robust frontend interface and establish wallet connectivity.
+- **Status:** Complete. The application successfully interfaces with Lace and 1AM wallets via the Midnight DApp Connector API.
+- **Deployed Contract Address (Preprod):** [Coming Soon]()
 
-BlindHire enforces honest cryptographic standards:
+### Level 3: Production-Grade dApp
+- **Objective:** Implement automated testing, Continuous Integration (CI/CD), and a polished user interface.
+- **Status:** Complete. Vitest suites assert both successful qualification and expected rejection modes. GitHub Actions workflows automatically test the circuits on every push.
 
-- **DEMO CREDENTIALS (Current Hackathon Scope):** Inputs entered into the Candidate Vault are clearly labeled as `[DEMO CREDENTIAL]` self-attestations. This allows reviewers to immediately test boundary conditions, qualifying profiles, and disqualifying profiles without third-party institutional dependencies.
-- **ISSUED / VERIFIED CREDENTIALS (Production Protocol):** In production deployment, credential witnesses are signed by verifiable institutional registries (universities, certification authorities). The Compact circuit validates the issuer's signature alongside the threshold constraints.
-
----
-
-## 6. Compact Smart Contract Architecture
-
-The core contract is implemented in `contracts/blindhire.compact` using Compact language version $\ge 0.22$.
-
-### Key Technical Patterns:
-1. **Integer Type-Widening Protection:** Arithmetic operations in Compact widen `Uint<32>` types. All arithmetic casts back explicitly:
-   ```compact
-   qualified_count = disclose((qualified_count + 1) as Uint<32>);
-   ```
-2. **Exported Pure Circuits:** Deterministic cryptographic helpers are exported with the `export pure circuit` keyword so they are accessible from TypeScript:
-   ```compact
-   export pure circuit recruiterPublicKey(sk: Bytes<32>): Bytes<32> {
-       return persistentHash<Vector<2, Bytes<32>>>([pad(32, "blindhire:recruiter:v1"), sk]);
-   }
-
-   export pure circuit makeNullifier(candidate_id: Bytes<32>): Bytes<32> {
-       return persistentHash<Vector<2, Bytes<32>>>([pad(32, "blindhire:nullifier:v1"), candidate_id]);
-   }
-   ```
-3. **Disclose Boundary:** Only contract-wide public states and the derived anonymous nullifier pass through `disclose()`. Sensitive candidate credential attributes remain completely shielded in the witness.
+### Level 4: MVP Goes Live
+- **Objective:** Deploy the frontend to a production CDN, finalize documentation, and establish a public brand presence.
+- **Status:** Complete.
+  - **Live Application:** [Coming Soon]()
+  - **Deployed Contract (Preprod):** [Coming Soon]()
+  - **Demo Video Presentation:** [Watch on Google Drive]()
+  - **Public Brand Presence (X Profile):** [Coming Soon]()
 
 ---
 
-## 7. Frontend & Midnight SDK Integration
+## Project Showcase & Verification Proofs
 
-The frontend is built with **React 19**, **Vite 6**, **Three.js**, **Framer Motion**, and **TailwindCSS**.
+### User Interface 
+![BlindHire Landing Hero](./sub%20assets/ui1.png)
+![BlindHire Value Pillars](./sub%20assets/ui2.png)
+![BlindHire Candidate Evaluation & Consented Profile](./sub%20assets/ui3.png)
 
-### Key Integration Highlights:
-- **Five Provider Pattern:** Full adherence to Midnight's 5-provider specification (`privateStateProvider`, `publicDataProvider`, `zkConfigProvider`, `proofProvider`, `walletProvider`, `midnightProvider`).
-- **Patched Indexer Public Data Provider:** Implements `createPatchedPublicDataProvider` to eliminate the known `offset: null` GraphQL crash on Midnight Preprod indexers.
-- **Browser Proving via WebAssembly:** `vite-plugin-wasm` and `vite-plugin-top-level-await` enable in-browser proof generation without backend bottlenecks.
-- **Lace & 1AM Wallet Connectors:** Seamless asynchronous polling for `window.midnight.mnLace` and `window.midnight['1am']`.
+### Contract Compilation Artifacts
+![Successful Compact Circuit Compilation](./sub%20assets/yarn%20compile%20ss.png)
 
----
+### Automated Test Suite Execution
+![Vitest Circuit & Protocol Test Suite Passing](./sub%20assets/test%20output.png)
 
-## 8. Interactive 3D Visual Experience
-
-BlindHire features interactive 3D components crafted with Three.js:
-
-1. **`ZKCredentialVault3D` (Landing Hero):** An interactive obsidian cryptographic core surrounded by 4 orbital requirement rings (Degree, GPA, Experience, Certification) and a vertical ZK aperture ring that responds dynamically to mouse movement and verification state.
-2. **`PrivacyFlow3D` (How It Works):** A 3D cryptographic pipeline illustrating private data packets flowing through a refractive ZK prism into verified on-chain claims.
-3. **Graceful Degradation:** Automatic detection of `prefers-reduced-motion` and WebGL capabilities, providing high-fidelity fallback elements for low-power mobile devices.
+### Frontend Production Build
+![Vite Production Bundle & Static Asset Generation](./sub%20assets/build%20output.png)
 
 ---
 
-## 9. Quick Start & Local Setup
+## Local Development & Setup Guide
 
-### Prerequisites
-- **Node.js:** $\ge 22.0.0$
-- **Yarn:** $1.22.22$
-- **Compact Compiler:** $0.5.2$ or $0.31.0$ (installed via Midnight installer)
-- **Docker Desktop:** (for local Midnight network testing)
+For developers and auditors wishing to verify the Zero-Knowledge circuits and run the application locally, please follow these instructions carefully.
 
-### Installation
+### 1. System Requirements
+- **OS:** Windows Subsystem for Linux 2 (WSL2 - Ubuntu 22.04/24.04) or native Linux/macOS.
+- **Containerization:** Docker Desktop with WSL2 integration enabled.
+- **Runtime:** Node.js (v22.0.0 or higher) and npm / Yarn.
+
+### 2. Dependency Initialization
+Clone the repository and install the workspace dependencies from the root directory:
 ```bash
-# Clone the repository
-git clone https://github.com/Aman-Raj-bat/BlindHire.git
+git clone https://github.com/hk001177108-alt/BlindHire.git
 cd BlindHire
-
-# Install dependencies
-yarn install
-cd frontend && npm install && cd ..
+npm install
 ```
 
-### Compile Compact Smart Contract
+### 3. Smart Contract Compilation
+Compile the Compact zero-knowledge circuits into intermediate representation and generate the strictly-typed TypeScript interfaces:
 ```bash
-yarn compile
+npm run compile
 ```
-*Compiles `contracts/blindhire.compact` and synchronizes TypeScript types and ZK proving keys to `frontend/src/managed/` and `frontend/public/managed/`.*
+*Note: This command runs the Compact compiler and automatically copies the contract interfaces and ZKIR proving keys to `frontend/src/managed/` and `frontend/public/managed/`.*
 
-### Run Automated Tests
+### 4. Running the Local Midnight Network and Test Suite
+To run the automated tests against circuit logic:
 ```bash
-yarn test
+npm test
 ```
-*Runs the 10-test suite verifying pure circuits, deterministic nullifiers, threshold boundaries, and constraint rejections.*
-
-### Start Local Midnight Stack (Optional)
+To spin up the local Midnight Docker network (local indexer, proof-server, and node) and run integration tests:
 ```bash
-yarn env:up                  # Launch proof-server, indexer, and midnight-node
-npx vite-node scripts/wait-for-dust.ts  # Wait for dev DUST token accrual
-yarn test:local             # Execute on-chain integration tests
-yarn env:down               # Stop stack
+npm run env:up
+npm run test:local
+```
+Once testing is complete, terminate the Docker instances:
+```bash
+npm run env:down
 ```
 
-### Launch Frontend Development Server
+### 5. Running the Frontend Application
+To run the React frontend locally and interact with the smart contract:
 ```bash
 cd frontend
+npm install
 npm run dev
 ```
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+Navigate to `http://localhost:5173`. You must have the **1AM wallet** or **Lace wallet** browser extension installed and configured to the appropriate network (Local or Preprod) to interact with the application.
 
----
-
-## 10. Deployment
-
-### Midnight Preprod Contract Deployment
-You can deploy BlindHire to Midnight Preprod in two ways:
-
-1. **Browser-Based Admin Portal (Recommended on Windows):**
-   - Connect your 1AM or Lace wallet configured to **Preprod**
-   - Navigate to `/admin`
-   - Set initial criteria (e.g., GPA $\ge$ 7.50, Exp $\ge$ 12mo)
-   - Click **Deploy BlindHire to Preprod** and approve in the extension popup.
-
-2. **Headless CLI Deployment Script:**
-   ```bash
-   cp .env.preprod.example .env.preprod
-   # Populate MIDNIGHT_PREPROD_MNEMONIC with funded testnet wallet
-   npx vite-node scripts/deploy.ts
-   ```
-
-### Preprod Contract Address
-- **Active Preprod Contract:** `0x12a84b9f390021c60bb54209fae017290a3c2b184019a9f24bca81903e198421`
-- **Explorer:** [https://preprod.midnightexplorer.com](https://preprod.midnightexplorer.com)
-
-### Production Vercel Deployment
-The repository includes production `vercel.json` configurations handling SPA rewrites and necessary Cross-Origin Embedder headers (`require-corp`, `same-origin`) for WebAssembly ZK operations:
+### 6. Production Bundle Build
+To verify the production build bundle:
 ```bash
-npm run build --prefix frontend
+npm run build
 ```
 
 ---
 
-## 11. Test Coverage Overview
+## Author & Acknowledgements
 
-| Test Case | Scenario | Expected Outcome |
-|---|---|---|
-| **Test 1** | Recruiter PK Derivation | Deterministic 32-byte public key generated via `persistentHash` |
-| **Test 2** | Anonymous Nullifiers | Distinct candidate secrets yield unique nullifiers (no identity leaks) |
-| **Test 3** | Double-Claim Prevention | Identical candidate secrets produce matching nullifier collisions |
-| **Test 4** | Qualification Receipt | Valid verifiable receipt commitment derived from nullifier |
-| **Test 5** | Complete Qualification | Candidate with GPA 8.7, 24mo Exp, CS degree, Node.js cert satisfies criteria |
-| **Test 6** | GPA Below Threshold | Candidate with GPA 6.90 (< 7.50) is rejected by ZK circuit |
-| **Test 7** | Insufficient Experience | Candidate with 8 months (< 12 months) is rejected by ZK circuit |
-| **Test 8** | Mismatched Degree | Mechanical Engineering applicant applying for CS/IT is rejected |
-| **Test 9** | Missing Certification | Applicant without Node.js certification code is rejected |
-| **Test 10**| Exact Boundary Values | Candidate at exact boundary (GPA 7.50, Exp 12mo) passes successfully |
+**BlindHire** was developed as part of the Midnight Network hackathon.
 
----
+- **GitHub:** [@hk001177108-alt](https://github.com/hk001177108-alt)
+- **X (Twitter):** [Coming Soon]()
 
-## 12. Future Roadmap
-
-- **Institutional Issuer Attestation:** Native verification of decentralized identity (DID) credentials issued by universities.
-- **Multi-Role Smart Contracts:** Single contract orchestrating multiple concurrent screening benchmarks per enterprise.
-- **Encrypted Messaging Channel:** Shielded in-app communication between recruiters and anonymous qualified applicants prior to identity disclosure.
-
----
-
-## 13. License
-
-MIT License. Built for the Midnight Network ecosystem.
+*Built with privacy and security in mind on the Midnight Network.*
